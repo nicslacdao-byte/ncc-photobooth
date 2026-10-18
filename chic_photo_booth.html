@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chic Photo Booth</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF7; /* Stockholm chic cream */
+        }
+        
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Video mirroring for a natural selfie experience */
+        #camera-stream {
+            transform: scaleX(-1);
+            transition: filter 0.3s ease;
+        }
+        
+        /* Photo Strip container styling for display */
+        .photo-strip-display {
+            background: #FDFBF7;
+            padding: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(128, 0, 32, 0.1);
+        }
+
+        /* Countdown Animation */
+        @keyframes pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+        .animate-pop {
+            animation: pop 1s ease-in-out;
+        }
+
+        /* Flash Animation */
+        .flash-active {
+            opacity: 1 !important;
+            transition: opacity 0.1s ease-out;
+        }
+        .flash-fade {
+            opacity: 0 !important;
+            transition: opacity 0.8s ease-in;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 flex flex-col items-center py-10 px-4 selection:bg-[#800020] selection:text-white">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-serif text-[#800020] tracking-wider mb-2">Atelier Booth</h1>
+        <p class="text-gray-500 font-light text-sm tracking-[0.2em] uppercase">Capture the sequence</p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="w-full max-w-5xl flex flex-col md:flex-row gap-10 items-start justify-center">
+        
+        <!-- Left: Camera View & Controls -->
+        <div class="flex flex-col items-center w-full md:w-1/2 md:sticky md:top-10">
+            <!-- Camera Container -->
+            <div class="relative w-full aspect-[4/3] bg-gray-200 rounded-xl overflow-hidden shadow-lg border-2 border-transparent transition-colors mb-6">
+                <!-- Video Feed -->
+                <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
+                
+                <!-- Countdown Overlay -->
+                <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-[#800020]/10 backdrop-blur-[2px] hidden z-10">
+                    <span id="countdown-text" class="text-9xl text-[#FDFBF7] font-serif font-bold drop-shadow-[0_4px_4px_rgba(128,0,32,0.5)]"></span>
+                </div>
+
+                <!-- Flash Overlay -->
+                <div id="flash-overlay" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-20"></div>
+
+                <!-- Progress Indicator -->
+                <div id="progress-indicator" class="absolute top-4 right-4 bg-[#800020] text-[#FDFBF7] px-3 py-1 rounded-full text-sm font-medium hidden z-10 tracking-widest shadow-md">
+                    1 / 4
+                </div>
+
+                <!-- Error Overlay -->
+                <div id="error-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#FDFBF7] p-6 text-center hidden z-30">
+                    <svg class="w-12 h-12 text-[#800020] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
+                    </svg>
+                    <p class="text-[#800020] font-serif text-lg mb-1">Camera Access Denied</p>
+                    <p class="text-sm text-gray-500 mb-4">Please allow camera access in your browser.</p>
+                    <button onclick="initCamera()" class="px-5 py-2 text-sm border border-[#800020] text-[#800020] rounded-full hover:bg-[#800020] hover:text-[#FDFBF7] transition-colors duration-300">
+                        Try Again
+                    </button>
+                </div>
+
+                <!-- Review Overlay (State Machine: Review Phase) -->
+                <div id="review-overlay" class="absolute inset-0 bg-[#FDFBF7]/90 backdrop-blur-sm flex flex-col items-center justify-between hidden z-20 p-6">
+                    <img id="review-image" src="" alt="Review" class="w-full h-[75%] object-cover rounded-lg border-2 border-[#800020]/20 shadow-xl">
+                    <div class="flex gap-4 w-full max-w-sm mt-4">
+                        <button onclick="resolveReview('recapture')" class="flex-1 py-3 text-sm font-medium rounded-full border-2 border-[#800020] text-[#800020] bg-transparent hover:bg-[#800020] hover:text-[#FDFBF7] transition-colors shadow-sm">Recapture</button>
+                        <button onclick="resolveReview('keep')" id="btn-keep" class="flex-1 py-3 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md hover:bg-[#600018] transition-colors">Keep</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Layout Selector -->
+            <div class="w-full flex flex-col items-center mb-6">
+                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Select Layout</p>
+                <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-md">
+                    <button onclick="setLayout('polaroid')" id="btn-polaroid" class="flex-1 py-2 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Polaroid</button>
+                    <button onclick="setLayout('strip')" id="btn-strip" class="flex-1 py-2 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Strip</button>
+                    <button onclick="setLayout('4r')" id="btn-4r" class="flex-1 py-2 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">4R Classic</button>
+                </div>
+            </div>
+
+            <!-- Filter Selector (Active during review phase) -->
+            <div class="w-full flex flex-col items-center mb-6">
+                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Select Filter</p>
+                <div class="flex flex-wrap justify-center gap-2 w-full max-w-md">
+                    <button onclick="setFilter('normal')" id="btn-filter-normal" class="px-4 py-1.5 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors border border-transparent">Normal</button>
+                    <button onclick="setFilter('bw')" id="btn-filter-bw" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">B&W</button>
+                    <button onclick="setFilter('vintage')" id="btn-filter-vintage" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Vintage</button>
+                    <button onclick="setFilter('y2k')" id="btn-filter-y2k" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Y2K</button>
+                    <button onclick="setFilter('cool')" id="btn-filter-cool" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Cool</button>
+                </div>
+            </div>
+
+            <!-- Timer Selector -->
+            <div class="w-full flex flex-col items-center mb-6">
+                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Timer Delay</p>
+                <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-sm">
+                    <button onclick="setTimer(3)" id="btn-timer-3" class="flex-1 py-1.5 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">3s</button>
+                    <button onclick="setTimer(5)" id="btn-timer-5" class="flex-1 py-1.5 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">5s</button>
+                    <button onclick="setTimer(10)" id="btn-timer-10" class="flex-1 py-1.5 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">10s</button>
+                </div>
+            </div>
+
+            <!-- Start Button -->
+            <button id="start-btn" onclick="startPhotoSequence()" class="bg-[#800020] text-[#FDFBF7] px-10 py-4 rounded-full font-medium tracking-widest uppercase shadow-xl shadow-[#800020]/20 hover:bg-[#600018] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
+                Start Booth
+            </button>
+            <p id="status-text" class="text-sm text-gray-500 mt-4 h-5 opacity-0 transition-opacity">Sequence ready...</p>
+        </div>
+
+        <!-- Right: Photo Strip Result -->
+        <div id="result-container" class="flex flex-col items-center w-full md:w-1/2 opacity-0 transition-opacity duration-1000 hidden md:flex">
+            
+            <div class="w-full max-w-[320px] flex flex-col items-center">
+                <!-- Final Photo Strip Image -->
+                <div class="photo-strip-display mb-6 transform rotate-1 hover:rotate-0 transition-transform duration-500 w-full">
+                    <img id="photo-result" src="" alt="Your Photo Strip" class="w-full h-auto block shadow-sm border border-gray-200">
+                </div>
+
+                <button id="download-btn" onclick="downloadPhotoStrip()" class="border-2 border-[#800020] text-[#800020] bg-transparent px-8 py-3 rounded-full font-medium tracking-wide hover:bg-[#800020] hover:text-[#FDFBF7] transition-all duration-300 w-full focus:outline-none flex items-center justify-center gap-2 shadow-md">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    Download Output
+                </button>
+            </div>
+            
+            <!-- Hidden Canvas for intermediate captures -->
+            <canvas id="temp-canvas" class="hidden"></canvas>
+            <!-- Hidden Canvas for final strip generation -->
+            <canvas id="strip-canvas" class="hidden"></canvas>
+        </div>
+    </main>
+
+    <script>
+        const video = document.getElementById('camera-stream');
+        const tempCanvas = document.getElementById('temp-canvas');
+        const stripCanvas = document.getElementById('strip-canvas');
+        const photoResult = document.getElementById('photo-result');
+        const startBtn = document.getElementById('start-btn');
+        const statusText = document.getElementById('status-text');
+        const errorOverlay = document.getElementById('error-overlay');
+        const countdownOverlay = document.getElementById('countdown-overlay');
+        const countdownText = document.getElementById('countdown-text');
+        const flashOverlay = document.getElementById('flash-overlay');
+        const progressIndicator = document.getElementById('progress-indicator');
+        const resultContainer = document.getElementById('result-container');
+        const reviewOverlay = document.getElementById('review-overlay');
+        const reviewImage = document.getElementById('review-image');
+        const btnKeep = document.getElementById('btn-keep');
+        
+        let stream = null;
+        let capturedFrames = [];
+        let currentLayout = 'strip'; // 'polaroid', 'strip', '4r'
+        let photosRequired = 4;
+        let currentFilter = 'normal';
+        let countdownTime = 3;
+        let reviewResolve = null;
+
+        const filterMap = {
+            'normal': 'none',
+            'bw': 'grayscale(100%)',
+            'vintage': 'sepia(80%) contrast(120%)',
+            'y2k': 'contrast(130%) saturate(150%) brightness(110%)',
+            'cool': 'sepia(30%) hue-rotate(180deg) saturate(150%)'
+        };
+
+        // Configuration for the final generated output
+        const STRIP_BG_COLOR = '#442b23'; // Dark brown base as requested
+        const FRAME_WIDTH = 600;
+        const FRAME_HEIGHT = 450;
+        const PADDING = 30; // Padding around and between frames
+        const BOTTOM_MARGIN = 150; // Extra space at bottom for event text
+
+        // Hardware Constants
+        const EVENT_NAME = "NCC INTERGRATIONAL ACTIVITY";
+        const EVENT_DATE = "2026";
+
+        function setLayout(layout) {
+            currentLayout = layout;
+            photosRequired = layout === 'polaroid' ? 1 : 4;
+            
+            const buttons = ['polaroid', 'strip', '4r'];
+            buttons.forEach(btn => {
+                const el = document.getElementById(`btn-${btn}`);
+                if (btn === layout) {
+                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.remove('text-gray-500', 'hover:text-[#800020]');
+                } else {
+                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.add('text-gray-500', 'hover:text-[#800020]');
+                }
+            });
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            video.style.filter = filterMap[filter]; 
+
+            const filters = ['normal', 'bw', 'vintage', 'y2k', 'cool'];
+            filters.forEach(f => {
+                const el = document.getElementById(`btn-filter-${f}`);
+                if (f === filter) {
+                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.remove('text-gray-500', 'bg-white', 'hover:text-[#800020]', 'border-gray-200');
+                } else {
+                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.add('text-gray-500', 'bg-white', 'hover:text-[#800020]', 'border-gray-200');
+                }
+            });
+
+            // Update the review image filter immediately if we are in the review phase
+            if (!reviewOverlay.classList.contains('hidden')) {
+                reviewImage.style.filter = filterMap[filter];
+            }
+        }
+
+        function setTimer(seconds) {
+            countdownTime = seconds;
+
+            const timers = [3, 5, 10];
+            timers.forEach(t => {
+                const el = document.getElementById(`btn-timer-${t}`);
+                if (t === seconds) {
+                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.remove('text-gray-500', 'hover:text-[#800020]');
+                } else {
+                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.add('text-gray-500', 'hover:text-[#800020]');
+                }
+            });
+        }
+
+        async function initCamera() {
+            errorOverlay.classList.add('hidden');
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: { ideal: 1280 }, height: { ideal: 960 }, facingMode: "user" }, 
+                    audio: false 
+                });
+                video.srcObject = stream;
+                startBtn.disabled = false;
+                statusText.classList.remove('opacity-0');
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                errorOverlay.classList.remove('hidden');
+                startBtn.disabled = true;
+            }
+        }
+
+        const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        function lockControls(lock) {
+            const controls = ['btn-polaroid', 'btn-strip', 'btn-4r', 'btn-timer-3', 'btn-timer-5', 'btn-timer-10'];
+            controls.forEach(id => document.getElementById(id).disabled = lock);
+        }
+
+        async function startPhotoSequence() {
+            if (!stream) return;
+
+            // Lock layouts and timers, reset UI
+            startBtn.disabled = true;
+            lockControls(true);
+            capturedFrames = [];
+            
+            resultContainer.classList.add('opacity-0');
+            setTimeout(() => {
+                if(window.innerWidth < 768) resultContainer.classList.add('hidden');
+            }, 500);
+            
+            progressIndicator.classList.remove('hidden');
+            statusText.innerText = "Get ready!";
+
+            // Capture Loop
+            for (let i = 0; i < photosRequired; i++) {
+                progressIndicator.innerText = `${i + 1} / ${photosRequired}`;
+                let frameAccepted = false;
+                
+                while (!frameAccepted) {
+                    await runCountdown();
+                    triggerFlash();
+                    
+                    // Capture raw frame without filters, filter applied on canvas later
+                    const frameDataUrl = captureFrame(); 
+                    
+                    // Show Review UI (Filter buttons remain active so user can change them)
+                    const action = await showReviewUI(frameDataUrl, i === photosRequired - 1);
+                    
+                    if (action === 'keep') {
+                        // Bake the currently selected filter into a new canvas before pushing
+                        const filteredFrameUrl = await applyCurrentFilterToDataUrl(frameDataUrl);
+                        capturedFrames.push(filteredFrameUrl);
+                        frameAccepted = true;
+                        
+                        if (i < photosRequired - 1) {
+                            statusText.innerText = "Next photo in a moment...";
+                            await sleep(750);
+                        }
+                    } else {
+                        statusText.innerText = "Retaking photo...";
+                        await sleep(500);
+                    }
+                }
+            }
+
+            // Finish Sequence
+            progressIndicator.classList.add('hidden');
+            statusText.innerText = `Generating ${currentLayout}...`;
+            
+            await generatePhotoLayout();
+            
+            statusText.innerText = "Done! Download your photo below.";
+            startBtn.disabled = false;
+            startBtn.innerText = "Retake Photos";
+            lockControls(false); // Unlock layouts/timers
+        }
+
+        function showReviewUI(dataUrl, isLast) {
+            return new Promise((resolve) => {
+                reviewImage.src = dataUrl;
+                reviewImage.style.filter = filterMap[currentFilter]; // Apply active filter visually
+                reviewOverlay.classList.remove('hidden');
+                btnKeep.innerText = isLast ? "Finish" : "Keep & Continue";
+                reviewResolve = resolve;
+            });
+        }
+
+        function resolveReview(action) {
+            if (reviewResolve) {
+                reviewOverlay.classList.add('hidden');
+                reviewResolve(action);
+                reviewResolve = null;
+            }
+        }
+
+        function runCountdown() {
+            return new Promise((resolve) => {
+                countdownOverlay.classList.remove('hidden');
+                let count = countdownTime;
+                
+                const triggerAnimation = () => {
+                    countdownText.innerText = count;
+                    countdownText.classList.remove('animate-pop');
+                    void countdownText.offsetWidth; // Reflow
+                    countdownText.classList.add('animate-pop');
+                };
+
+                triggerAnimation();
+
+                const timer = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        triggerAnimation();
+                    } else {
+                        clearInterval(timer);
+                        countdownOverlay.classList.add('hidden');
+                        resolve();
+                    }
+                }, 1000);
+            });
+        }
+
+        function triggerFlash() {
+            flashOverlay.classList.remove('flash-fade');
+            flashOverlay.classList.add('flash-active');
+            
+            setTimeout(() => {
+                flashOverlay.classList.remove('flash-active');
+                flashOverlay.classList.add('flash-fade');
+            }, 50);
+        }
+
+        function captureFrame() {
+            const vWidth = video.videoWidth;
+            const vHeight = video.videoHeight;
+            tempCanvas.width = vWidth;
+            tempCanvas.height = vHeight;
+            const ctx = tempCanvas.getContext('2d');
+            
+            // Mirror image horizontally
+            ctx.translate(vWidth, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, vWidth, vHeight);
+            
+            return tempCanvas.toDataURL('image/jpeg', 1.0);
+        }
+
+        function applyCurrentFilterToDataUrl(dataUrl) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const ctx = tempCanvas.getContext('2d');
+                    tempCanvas.width = img.width;
+                    tempCanvas.height = img.height;
+                    
+                    ctx.filter = filterMap[currentFilter];
+                    ctx.drawImage(img, 0, 0);
+                    ctx.filter = 'none'; // reset
+                    
+                    resolve(tempCanvas.toDataURL('image/jpeg', 0.95));
+                };
+                img.src = dataUrl;
+            });
+        }
+
+        function generatePhotoLayout() {
+            return new Promise((resolve) => {
+                const ctx = stripCanvas.getContext('2d');
+                let canvasWidth, canvasHeight;
+
+                if (currentLayout === 'polaroid') {
+                    canvasWidth = FRAME_WIDTH + (PADDING * 2);
+                    canvasHeight = FRAME_HEIGHT + (PADDING * 2) + BOTTOM_MARGIN;
+                } else if (currentLayout === 'strip') {
+                    canvasWidth = FRAME_WIDTH + (PADDING * 2);
+                    canvasHeight = (FRAME_HEIGHT * 4) + (PADDING * 5) + BOTTOM_MARGIN;
+                } else if (currentLayout === '4r') {
+                    // 4R Landscape (2x2 grid)
+                    canvasWidth = 1800;
+                    canvasHeight = 1200;
+                }
+                
+                stripCanvas.width = canvasWidth;
+                stripCanvas.height = canvasHeight;
+
+                // Solid background
+                ctx.fillStyle = STRIP_BG_COLOR;
+                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+                let loadedImages = 0;
+                const images = [];
+
+                capturedFrames.forEach((src, index) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        images[index] = img;
+                        loadedImages++;
+                        if (loadedImages === photosRequired) {
+                            if (currentLayout === 'polaroid') drawPolaroid(ctx, images[0], canvasWidth, canvasHeight);
+                            else if (currentLayout === 'strip') drawStrip(ctx, images, canvasWidth, canvasHeight);
+                            else if (currentLayout === '4r') draw4R(ctx, images, canvasWidth, canvasHeight);
+                            
+                            resolve();
+                        }
+                    };
+                    img.src = src;
+                });
+            });
+        }
+
+        function drawPolaroid(ctx, img, canvasWidth, canvasHeight) {
+            drawCroppedImage(ctx, img, PADDING, PADDING, FRAME_WIDTH, FRAME_HEIGHT);
+            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (BOTTOM_MARGIN / 2) + 15, canvasWidth);
+            finalizeCanvas();
+        }
+
+        function drawStrip(ctx, images, canvasWidth, canvasHeight) {
+            images.forEach((img, index) => {
+                const yPos = PADDING + (index * (FRAME_HEIGHT + PADDING));
+                drawCroppedImage(ctx, img, PADDING, yPos, FRAME_WIDTH, FRAME_HEIGHT);
+            });
+            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (BOTTOM_MARGIN / 2) + 15, canvasWidth);
+            finalizeCanvas();
+        }
+
+        function draw4R(ctx, images, canvasWidth, canvasHeight) {
+            const padding4R = 40;
+            const bottomSpace = 180;
+            const availableWidth = canvasWidth - (padding4R * 3); 
+            const availableHeight = canvasHeight - bottomSpace - (padding4R * 3); 
+            
+            const cellWidth = availableWidth / 2;
+            const cellHeight = availableHeight / 2;
+
+            images.forEach((img, index) => {
+                const col = index % 2;
+                const row = Math.floor(index / 2);
+                
+                const xPos = padding4R + (col * (cellWidth + padding4R));
+                const yPos = padding4R + (row * (cellHeight + padding4R));
+                
+                drawCroppedImage(ctx, img, xPos, yPos, cellWidth, cellHeight);
+            });
+
+            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (bottomSpace / 2) + 15, canvasWidth, true);
+            finalizeCanvas();
+        }
+
+        function drawCroppedImage(ctx, img, x, y, width, height) {
+            // Shadow behind image
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.fillRect(x + 4, y + 4, width, height);
+
+            // Center Crop Math
+            const sRatio = img.width / img.height;
+            const dRatio = width / height;
+            let sx = 0, sy = 0, sw = img.width, sh = img.height;
+
+            if (sRatio > dRatio) {
+                sw = img.height * dRatio;
+                sx = (img.width - sw) / 2;
+            } else {
+                sh = img.width / dRatio;
+                sy = (img.height - sh) / 2;
+            }
+
+            ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
+        }
+
+        function addBrandingText(ctx, x, y, canvasWidth, isLarge = false) {
+            ctx.fillStyle = '#FFFFFF'; 
+            ctx.textAlign = 'center';
+            
+            const titleSize = isLarge ? 48 : 34;
+            const dateSize = isLarge ? 56 : 42;
+            const spacing = isLarge ? 50 : 38;
+
+            // Line 1: Hardcoded Event Name
+            ctx.font = `900 ${titleSize}px "Inter", sans-serif`;
+            ctx.fillText(EVENT_NAME, x, y - 10);
+            
+            // Line 2: Hardcoded Event Date
+            ctx.font = `italic ${dateSize}px "Playfair Display", serif`;
+            ctx.fillText(EVENT_DATE, x, y + spacing);
+        }
+
+        function finalizeCanvas() {
+            const finalDataUrl = stripCanvas.toDataURL('image/jpeg', 0.95);
+            photoResult.src = finalDataUrl;
+            
+            resultContainer.classList.remove('hidden');
+            setTimeout(() => {
+                resultContainer.classList.remove('opacity-0');
+            }, 50);
+
+            if (window.innerWidth < 768) {
+                setTimeout(() => {
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+
+        function downloadPhotoStrip() {
+            if (!photoResult.src) return;
+            const link = document.createElement('a');
+            link.download = `atelier-${currentLayout}-${Date.now()}.jpg`;
+            link.href = photoResult.src;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.onload = initCamera;
+    </script>
+</body>
+</html>
