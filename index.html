@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chic Photo Booth - 4x6 Print Edition</title>
+    <title>NCC INTEGRATIONAL ACTIVITY 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&family=Playfair+Display:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&display=swap" rel="stylesheet">
     <style>
         /* Lock page to exact screen resolution on any monitor or phone */
         html, body {
@@ -57,27 +57,26 @@
         }
     </style>
 </head>
-<body class="text-gray-800 flex flex-col items-center justify-between py-2.5 px-4 md:py-5 md:px-8 selection:bg-[#4A0404] selection:text-white">
+<body class="text-gray-800 flex flex-col items-center justify-between py-2 px-3 md:py-4 md:px-8 selection:bg-[#4A0404] selection:text-white">
 
-    <!-- Header -->
-    <header class="text-center shrink-0 mb-1.5 md:mb-3">
-        <h1 class="text-xl md:text-3xl font-serif text-[#4A0404] tracking-wider">Atelier Booth</h1>
-        <p class="text-gray-500 font-light text-[10px] md:text-xs tracking-[0.18em] uppercase">
-            2"×3" Strip (1.8"×1.2" Photos) • 4 Strips per 4"×6" Paper
-        </p>
+    <!-- Header (Updated Title, Subtitle Removed) -->
+    <header class="text-center shrink-0 mb-1 md:mb-2">
+        <h1 class="text-lg sm:text-2xl md:text-3xl font-serif font-bold text-[#4A0404] tracking-wider">
+            NCC INTEGRATIONAL ACTIVITY 2026
+        </h1>
     </header>
 
     <!-- Main Content Area -->
-    <main class="w-full max-w-6xl flex-1 min-h-0 flex flex-col md:flex-row gap-4 md:gap-8 items-center justify-center">
+    <main class="w-full max-w-6xl flex-1 min-h-0 flex flex-col md:flex-row gap-3 md:gap-8 items-center justify-center">
         
         <!-- Left: Camera View & Controls -->
         <div class="flex flex-col items-center justify-center w-full md:w-3/5 h-full min-h-0">
             
-            <!-- Strip Queue Status Bar -->
-            <div class="flex items-center justify-between w-full max-w-[600px] mb-2 px-1">
+            <!-- Strip Queue Status Bar (Face Tracking Badge Removed) -->
+            <div class="flex items-center justify-between w-full max-w-[580px] mb-1.5 px-1">
                 <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-semibold uppercase tracking-wider text-[#4A0404]">4×6 Paper Progress:</span>
-                    <span id="sheet-counter-badge" class="bg-[#4A0404] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">0 / 4 Strips</span>
+                    <span class="text-[11px] md:text-xs font-semibold uppercase tracking-wider text-[#4A0404]">4×6 Paper Progress:</span>
+                    <span id="sheet-counter-badge" class="bg-[#4A0404] text-white text-[11px] md:text-xs font-bold px-2.5 py-0.5 rounded-full">0 / 4 Strips</span>
                 </div>
                 <button onclick="openMobileResult()" class="md:hidden text-xs font-medium text-[#4A0404] underline">
                     View 4×6 Paper
@@ -85,10 +84,16 @@
             </div>
 
             <!-- Camera Container: 3:2 Aspect Ratio to match 1.8" x 1.2" Picture Dimension -->
-            <div class="relative w-full max-w-[600px] max-h-[44dvh] md:max-h-[52dvh] aspect-[3/2] bg-gray-200 rounded-xl overflow-hidden shadow-lg border-2 border-[#4A0404]/20 transition-colors mb-2.5 md:mb-4 flex items-center justify-center">
+            <div class="relative w-full max-w-[580px] max-h-[38dvh] md:max-h-[46dvh] aspect-[3/2] bg-gray-200 rounded-xl overflow-hidden shadow-lg border-2 border-[#4A0404]/20 transition-colors mb-2 md:mb-3 flex items-center justify-center">
                 <!-- Video Feed -->
                 <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
                 
+                <!-- Live Vintage Mocha Tint Overlay (Visible when Vintage filter is active) -->
+                <div id="live-vintage-tint" class="absolute inset-0 pointer-events-none hidden z-[5]" style="background: radial-gradient(circle, rgba(65,40,25,0.08) 40%, rgba(45,25,12,0.28) 100%); mix-blend-mode: multiply;"></div>
+
+                <!-- Live AR Face-Tracking Sticker Overlay Canvas -->
+                <canvas id="live-sticker-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-[6]"></canvas>
+
                 <!-- Countdown Overlay -->
                 <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-[#4A0404]/20 backdrop-blur-[2px] hidden z-10">
                     <span id="countdown-text" class="text-7xl md:text-9xl text-[#FDFBF7] font-serif font-bold drop-shadow-[0_4px_4px_rgba(74,4,4,0.6)]"></span>
@@ -98,7 +103,7 @@
                 <div id="flash-overlay" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-20"></div>
 
                 <!-- Progress Indicator (2 photos per strip) -->
-                <div id="progress-indicator" class="absolute top-3 right-3 bg-[#4A0404] text-[#FDFBF7] px-3 py-1 rounded-full text-xs md:text-sm font-medium hidden z-10 tracking-widest shadow-md">
+                <div id="progress-indicator" class="absolute top-3 right-3 bg-[#4A0404] text-[#FDFBF7] px-3 py-1 rounded-full text-xs font-medium hidden z-10 tracking-widest shadow-md">
                     Photo 1 / 2
                 </div>
 
@@ -116,44 +121,62 @@
                 </div>
 
                 <!-- Review Overlay -->
-                <div id="review-overlay" class="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-sm flex flex-col items-center justify-between hidden z-20 p-3 md:p-4">
-                    <img id="review-image" src="" alt="Review" class="w-full h-[76%] object-cover rounded-lg border-2 border-[#4A0404]/20 shadow-md">
-                    <div class="flex gap-3 w-full max-w-xs mt-2">
-                        <button onclick="resolveReview('recapture')" class="flex-1 py-2 text-xs md:text-sm font-medium rounded-full border-2 border-[#4A0404] text-[#4A0404] bg-transparent hover:bg-[#4A0404] hover:text-[#FDFBF7] transition-colors shadow-sm">Recapture</button>
-                        <button onclick="resolveReview('keep')" id="btn-keep" class="flex-1 py-2 text-xs md:text-sm font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md hover:bg-[#350202] transition-colors">Keep</button>
+                <div id="review-overlay" class="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-sm flex flex-col items-center justify-between hidden z-20 p-2.5 md:p-4">
+                    <div class="relative w-full h-[76%] rounded-lg overflow-hidden border-2 border-[#4A0404]/20 shadow-md">
+                        <img id="review-image" src="" alt="Review" class="w-full h-full object-cover">
+                        <!-- Review Vintage Tint -->
+                        <div id="review-vintage-tint" class="absolute inset-0 pointer-events-none hidden" style="background: radial-gradient(circle, rgba(65,40,25,0.08) 40%, rgba(45,25,12,0.28) 100%); mix-blend-mode: multiply;"></div>
+                        <!-- Review Sticker Overlay -->
+                        <canvas id="review-sticker-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                    </div>
+                    <div class="flex gap-3 w-full max-w-xs mt-1.5">
+                        <button onclick="resolveReview('recapture')" class="flex-1 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-full border-2 border-[#4A0404] text-[#4A0404] bg-transparent hover:bg-[#4A0404] hover:text-[#FDFBF7] transition-colors shadow-sm">Recapture</button>
+                        <button onclick="resolveReview('keep')" id="btn-keep" class="flex-1 py-1.5 md:py-2 text-xs md:text-sm font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md hover:bg-[#350202] transition-colors">Keep</button>
                     </div>
                 </div>
             </div>
 
             <!-- Controls Panel -->
-            <div class="w-full max-w-md flex flex-col items-center shrink-0">
-                <!-- Filter Selector -->
-                <div class="w-full flex flex-col items-center mb-2 md:mb-3">
-                    <p class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mb-1 font-medium">Select Filter</p>
-                    <div class="flex flex-wrap justify-center gap-1.5 md:gap-2 w-full">
-                        <button onclick="setFilter('normal')" id="btn-filter-normal" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors border border-transparent">Normal</button>
-                        <button onclick="setFilter('bw')" id="btn-filter-bw" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">B&W</button>
-                        <button onclick="setFilter('vintage')" id="btn-filter-vintage" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Vintage</button>
-                        <button onclick="setFilter('y2k')" id="btn-filter-y2k" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Y2K</button>
-                        <button onclick="setFilter('cool')" id="btn-filter-cool" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Cool</button>
+            <div class="w-full max-w-lg flex flex-col items-center shrink-0">
+                
+                <!-- Filter Selector (Cool removed, Vintage updated to Espresso Mocha) -->
+                <div class="w-full flex flex-col items-center mb-1.5 md:mb-2.5">
+                    <p class="text-[9px] md:text-[11px] uppercase tracking-widest text-gray-500 mb-1 font-medium">Select Filter</p>
+                    <div class="flex flex-wrap justify-center gap-1.5 w-full">
+                        <button onclick="setFilter('normal')" id="btn-filter-normal" class="px-3 py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors border border-transparent">Normal</button>
+                        <button onclick="setFilter('bw')" id="btn-filter-bw" class="px-3 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">B&W</button>
+                        <button onclick="setFilter('vintage')" id="btn-filter-vintage" class="px-3 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Vintage</button>
+                        <button onclick="setFilter('y2k')" id="btn-filter-y2k" class="px-3 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Y2K</button>
                     </div>
                 </div>
 
-                <!-- Timer Selector -->
-                <div class="w-full flex flex-col items-center mb-2.5 md:mb-4">
-                    <p class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mb-1 font-medium">Timer Delay</p>
-                    <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-xs">
-                        <button onclick="setTimer(3)" id="btn-timer-3" class="flex-1 py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">3s</button>
-                        <button onclick="setTimer(5)" id="btn-timer-5" class="flex-1 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">5s</button>
-                        <button onclick="setTimer(10)" id="btn-timer-10" class="flex-1 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">10s</button>
+                <!-- Sticker Selector (Follows User Face Automatically!) -->
+                <div class="w-full flex flex-col items-center mb-1.5 md:mb-2.5">
+                    <p class="text-[9px] md:text-[11px] uppercase tracking-widest text-gray-500 mb-1 font-medium">Select AR Face Sticker</p>
+                    <div class="flex flex-wrap justify-center gap-1.5 w-full">
+                        <button onclick="setSticker('none')" id="btn-sticker-none" class="px-2.5 py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors border border-transparent">None</button>
+                        <button onclick="setSticker('hearts')" id="btn-sticker-hearts" class="px-2.5 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">💕 Hearts Crown</button>
+                        <button onclick="setSticker('sparkles')" id="btn-sticker-sparkles" class="px-2.5 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">✨ Sparkles</button>
+                        <button onclick="setSticker('blush')" id="btn-sticker-blush" class="px-2.5 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">🌸 Cheek Blush</button>
+                        <button onclick="setSticker('bows')" id="btn-sticker-bows" class="px-2.5 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">🎀 Coquette Bows</button>
+                        <button onclick="setSticker('datestamp')" id="btn-sticker-datestamp" class="px-2.5 py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">📸 '26 Cam Stamp</button>
                     </div>
                 </div>
 
-                <!-- Start Button -->
-                <button id="start-btn" onclick="startPhotoSequence()" class="bg-[#4A0404] text-[#FDFBF7] px-8 py-2.5 md:px-10 md:py-3 rounded-full text-xs md:text-sm font-medium tracking-widest uppercase shadow-xl shadow-[#4A0404]/20 hover:bg-[#350202] transition-all duration-300 w-full max-w-xs sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
-                    Capture Strip 1 of 4
-                </button>
-                <p id="status-text" class="text-xs text-gray-500 mt-1 h-4 opacity-0 transition-opacity">Ready for Strip 1...</p>
+                <!-- Timer Selector & Start Button Row -->
+                <div class="w-full flex flex-col sm:flex-row items-center justify-center gap-2 md:gap-4 mt-1">
+                    <div class="flex items-center gap-1.5 bg-white rounded-full p-1 shadow-sm border border-gray-200">
+                        <span class="text-[10px] uppercase tracking-wider text-gray-400 pl-2.5 pr-1 font-medium">Timer:</span>
+                        <button onclick="setTimer(3)" id="btn-timer-3" class="px-3 py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-sm transition-colors disabled:opacity-50">3s</button>
+                        <button onclick="setTimer(5)" id="btn-timer-5" class="px-3 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50">5s</button>
+                        <button onclick="setTimer(10)" id="btn-timer-10" class="px-3 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50">10s</button>
+                    </div>
+
+                    <button id="start-btn" onclick="startPhotoSequence()" class="bg-[#4A0404] text-[#FDFBF7] px-7 py-2.5 rounded-full text-xs md:text-sm font-medium tracking-widest uppercase shadow-xl shadow-[#4A0404]/20 hover:bg-[#350202] transition-all duration-300 w-full max-w-xs sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
+                        Capture Strip 1 of 4
+                    </button>
+                </div>
+                <p id="status-text" class="text-[11px] text-gray-500 mt-1 h-4 opacity-0 transition-opacity">Ready for Strip 1...</p>
             </div>
         </div>
 
@@ -167,14 +190,14 @@
                 </div>
 
                 <!-- 4x6 Photo Paper Preview Canvas Image -->
-                <div class="photo-paper-display mb-3 flex items-center justify-center max-h-[60dvh]">
-                    <img id="paper-result" src="" alt="4x6 Photo Paper Preview" class="max-h-[56dvh] w-auto aspect-[2/3] object-contain block border border-gray-200">
+                <div class="photo-paper-display mb-3 flex items-center justify-center max-h-[58dvh]">
+                    <img id="paper-result" src="" alt="4x6 Photo Paper Preview" class="max-h-[54dvh] w-auto aspect-[2/3] object-contain block border border-gray-200">
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="flex flex-col gap-2 w-full max-w-[300px] shrink-0">
                     <div class="flex gap-2 w-full">
-                        <!-- Take Next Strip Button (For Mobile / Quick Workflow) -->
+                        <!-- Back to Camera Button (Mobile) -->
                         <button id="next-strip-btn" onclick="closeMobileResult()" class="md:hidden flex-1 border-2 border-gray-300 text-gray-700 bg-white px-3 py-2 rounded-full text-xs font-medium tracking-wide hover:bg-gray-100 transition-all">
                             Back to Camera
                         </button>
@@ -200,11 +223,40 @@
         </div>
     </main>
 
+    <!-- Load MediaPipe Vision Tasks for Real-Time Face Detection (Runs silently in background) -->
+    <script type="module">
+        import { FaceDetector, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
+
+        async function setupFaceDetector() {
+            try {
+                const vision = await FilesetResolver.forVisionTasks(
+                    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+                );
+                window.faceDetector = await FaceDetector.createFromOptions(vision, {
+                    baseOptions: {
+                        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/face_detector/blaze_face_short_range/float16/1/blaze_face_short_range.tflite",
+                        delegate: "GPU"
+                    },
+                    runningMode: "VIDEO",
+                    minDetectionConfidence: 0.5
+                });
+            } catch (err) {
+                console.warn("MediaPipe GPU fallback to CPU or unavailable:", err);
+            }
+        }
+
+        setupFaceDetector();
+    </script>
+
     <script>
         const video = document.getElementById('camera-stream');
         const tempCanvas = document.getElementById('temp-canvas');
         const singleStripCanvas = document.getElementById('single-strip-canvas');
         const paperCanvas = document.getElementById('paper-canvas');
+        const liveStickerCanvas = document.getElementById('live-sticker-canvas');
+        const reviewStickerCanvas = document.getElementById('review-sticker-canvas');
+        const liveVintageTint = document.getElementById('live-vintage-tint');
+        const reviewVintageTint = document.getElementById('review-vintage-tint');
         const paperResult = document.getElementById('paper-result');
         const startBtn = document.getElementById('start-btn');
         const statusText = document.getElementById('status-text');
@@ -224,53 +276,173 @@
         let capturedFrames = [];
         let completedStrips = []; // Holds up to 4 dataURLs of 2"x3" strips to fill one 4"x6" photo paper
         
-        const PHOTOS_PER_STRIP = 2; // 2 photos per strip as shown in your reference image
+        // Real-Time Face Tracking State
+        let liveFaces = [];           // Current frame's detected face anchors (smoothed)
+        let capturedFaceAnchors = []; // Frozen face anchors at the exact moment a photo is snapped
+        let lastVideoTime = -1;
+
+        const PHOTOS_PER_STRIP = 2; // 2 photos per strip
         const STRIPS_PER_PAPER = 4; // 4 strips (2x3) fill one 4x6 photo paper
         
         let currentFilter = 'normal';
+        let currentSticker = 'none';
         let countdownTime = 3;
         let reviewResolve = null;
 
         const filterMap = {
             'normal': 'none',
-            'bw': 'grayscale(100%)',
-            'vintage': 'sepia(80%) contrast(120%)',
-            'y2k': 'contrast(130%) saturate(150%) brightness(110%)',
-            'cool': 'sepia(30%) hue-rotate(180deg) saturate(150%)'
+            'bw': 'grayscale(100%) contrast(108%)',
+            'vintage': 'sepia(48%) saturate(72%) contrast(114%) brightness(95%) hue-rotate(-8deg)',
+            'y2k': 'contrast(125%) saturate(145%) brightness(108%)'
         };
 
         // ============================================================================
         // EXACT PRINT DIMENSIONS AT 300 DPI (Dots Per Inch)
         // ============================================================================
         const DPI = 300;
-        
-        // 1. Picture Dimension: W: 1.8", H: 1.2" -> 540px x 360px
-        const PIC_WIDTH = Math.round(1.8 * DPI);  // 540px
-        const PIC_HEIGHT = Math.round(1.2 * DPI); // 360px
+        const PIC_WIDTH = Math.round(1.8 * DPI);    // 540px (1.8 inches)
+        const PIC_HEIGHT = Math.round(1.2 * DPI);   // 360px (1.2 inches)
+        const STRIP_WIDTH = Math.round(2.0 * DPI);  // 600px (2.0 inches)
+        const STRIP_HEIGHT = Math.round(3.0 * DPI); // 900px (3.0 inches)
+        const PAPER_WIDTH = Math.round(4.0 * DPI);  // 1200px (4.0 inches)
+        const PAPER_HEIGHT = Math.round(6.0 * DPI); // 1800px (6.0 inches)
 
-        // 2. Strip Size: W: 2.0", H: 3.0" -> 600px x 900px
-        const STRIP_WIDTH = Math.round(2.0 * DPI);  // 600px
-        const STRIP_HEIGHT = Math.round(3.0 * DPI); // 900px
+        const STRIP_BG_COLOR = '#4A0404';
+        const SIDE_MARGIN = Math.round((STRIP_WIDTH - PIC_WIDTH) / 2); // 30px
+        const TOP_MARGIN = 26;
+        const PHOTO_GAP = 26;
 
-        // 3. Photo Paper Size: W: 4.0", H: 6.0" -> 1200px x 1800px
-        const PAPER_WIDTH = Math.round(4.0 * DPI);  // 1200px
-        const PAPER_HEIGHT = Math.round(6.0 * DPI); // 1800px
-
-        // Strip Theme & Layout Margins (Matches your uploaded maroon reference photo)
-        const STRIP_BG_COLOR = '#4A0404'; // Deep maroon from your reference image
-        const SIDE_MARGIN = Math.round((STRIP_WIDTH - PIC_WIDTH) / 2); // 30px (0.1 inch border on left & right)
-        const TOP_MARGIN = 26; // Top maroon border
-        const PHOTO_GAP = 26;  // Maroon gap between Photo 1 and Photo 2
-
-        // Event Text Constants (Matches your reference image)
         const EVENT_NAME = "NCC INTEGRATIONAL ACTIVITY";
         const EVENT_DATE = "2026";
 
+        // ============================================================================
+        // REAL-TIME FACE TRACKING LOOP (60 FPS)
+        // ============================================================================
+        function trackFacesLoop() {
+            if (video.readyState >= 2 && !video.paused) {
+                if (window.faceDetector && video.currentTime !== lastVideoTime) {
+                    lastVideoTime = video.currentTime;
+                    try {
+                        const result = window.faceDetector.detectForVideo(video, performance.now());
+                        updateLiveFaceAnchors(result.detections || []);
+                    } catch (e) {
+                        // Ignore transient frame errors
+                    }
+                }
+                // Redraw live sticker canvas at 60fps following the user's face
+                liveStickerCanvas.width = PIC_WIDTH;
+                liveStickerCanvas.height = PIC_HEIGHT;
+                const liveCtx = liveStickerCanvas.getContext('2d');
+                liveCtx.clearRect(0, 0, PIC_WIDTH, PIC_HEIGHT);
+                drawStickerLayer(liveCtx, PIC_WIDTH, PIC_HEIGHT, currentSticker, liveFaces);
+            }
+            requestAnimationFrame(trackFacesLoop);
+        }
+
+        // Converts raw video coordinates into mirrored 3:2 cropped canvas coordinates (540x360)
+        function updateLiveFaceAnchors(detections) {
+            const vWidth = video.videoWidth;
+            const vHeight = video.videoHeight;
+            if (!vWidth || !vHeight) return;
+
+            const sRatio = vWidth / vHeight;
+            const dRatio = PIC_WIDTH / PIC_HEIGHT; // 1.5 (3:2)
+            let sx = 0, sy = 0, sw = vWidth, sh = vHeight;
+
+            if (sRatio > dRatio) {
+                sw = vHeight * dRatio;
+                sx = (vWidth - sw) / 2;
+            } else {
+                sh = vWidth / dRatio;
+                sy = (vHeight - sh) / 2;
+            }
+
+            const toCanvasPt = (normX, normY) => {
+                const rawPx = normX * vWidth;
+                const rawPy = normY * vHeight;
+                const croppedX = ((rawPx - sx) / sw) * PIC_WIDTH;
+                const croppedY = ((rawPy - sy) / sh) * PIC_HEIGHT;
+                return { x: PIC_WIDTH - croppedX, y: croppedY };
+            };
+
+            const newFaces = detections.slice(0, 4).map(det => {
+                const kp = det.keypoints;
+                const eyeA = toCanvasPt(kp[0].x, kp[0].y);
+                const eyeB = toCanvasPt(kp[1].x, kp[1].y);
+
+                const leftEye = eyeA.x < eyeB.x ? eyeA : eyeB;
+                const rightEye = eyeA.x < eyeB.x ? eyeB : eyeA;
+
+                const eyeCenterX = (leftEye.x + rightEye.x) / 2;
+                const eyeCenterY = (leftEye.y + rightEye.y) / 2;
+                const dx = rightEye.x - leftEye.x;
+                const dy = rightEye.y - leftEye.y;
+                const eyeDist = Math.hypot(dx, dy);
+                const angle = Math.atan2(dy, dx);
+
+                return {
+                    eyeCenterX,
+                    eyeCenterY,
+                    leftEye,
+                    rightEye,
+                    eyeDist,
+                    angle
+                };
+            });
+
+            if (newFaces.length === 0) {
+                liveFaces = [];
+            } else if (liveFaces.length !== newFaces.length) {
+                liveFaces = newFaces;
+            } else {
+                const smooth = 0.45;
+                liveFaces = newFaces.map((nf, idx) => {
+                    const pf = liveFaces[idx];
+                    return {
+                        eyeCenterX: pf.eyeCenterX + (nf.eyeCenterX - pf.eyeCenterX) * smooth,
+                        eyeCenterY: pf.eyeCenterY + (nf.eyeCenterY - pf.eyeCenterY) * smooth,
+                        leftEye: {
+                            x: pf.leftEye.x + (nf.leftEye.x - pf.leftEye.x) * smooth,
+                            y: pf.leftEye.y + (nf.leftEye.y - pf.leftEye.y) * smooth
+                        },
+                        rightEye: {
+                            x: pf.rightEye.x + (nf.rightEye.x - pf.rightEye.x) * smooth,
+                            y: pf.rightEye.y + (nf.rightEye.y - pf.rightEye.y) * smooth
+                        },
+                        eyeDist: pf.eyeDist + (nf.eyeDist - pf.eyeDist) * smooth,
+                        angle: pf.angle + (nf.angle - pf.angle) * smooth
+                    };
+                });
+            }
+        }
+
+        function getFallbackFaceAnchor(w, h) {
+            return [{
+                eyeCenterX: w * 0.5,
+                eyeCenterY: h * 0.44,
+                leftEye: { x: w * 0.41, y: h * 0.44 },
+                rightEye: { x: w * 0.59, y: h * 0.44 },
+                eyeDist: w * 0.18,
+                angle: 0
+            }];
+        }
+
+        // ============================================================================
+        // FILTER & STICKER CONTROLS
+        // ============================================================================
         function setFilter(filter) {
             currentFilter = filter;
-            video.style.filter = filterMap[filter]; 
+            video.style.filter = filterMap[filter];
 
-            const filters = ['normal', 'bw', 'vintage', 'y2k', 'cool'];
+            if (filter === 'vintage') {
+                liveVintageTint.classList.remove('hidden');
+                reviewVintageTint.classList.remove('hidden');
+            } else {
+                liveVintageTint.classList.add('hidden');
+                reviewVintageTint.classList.add('hidden');
+            }
+
+            const filters = ['normal', 'bw', 'vintage', 'y2k'];
             filters.forEach(f => {
                 const el = document.getElementById(`btn-filter-${f}`);
                 if (f === filter) {
@@ -287,6 +459,219 @@
             }
         }
 
+        function setSticker(sticker) {
+            currentSticker = sticker;
+
+            const stickers = ['none', 'hearts', 'sparkles', 'blush', 'bows', 'datestamp'];
+            stickers.forEach(s => {
+                const el = document.getElementById(`btn-sticker-${s}`);
+                if (s === sticker) {
+                    el.classList.add('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.remove('text-gray-500', 'bg-white', 'hover:text-[#4A0404]', 'border-gray-200');
+                } else {
+                    el.classList.remove('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.add('text-gray-500', 'bg-white', 'hover:text-[#4A0404]', 'border-gray-200');
+                }
+            });
+
+            updateReviewStickerPreview();
+        }
+
+        function updateReviewStickerPreview() {
+            reviewStickerCanvas.width = PIC_WIDTH;
+            reviewStickerCanvas.height = PIC_HEIGHT;
+            const revCtx = reviewStickerCanvas.getContext('2d');
+            revCtx.clearRect(0, 0, PIC_WIDTH, PIC_HEIGHT);
+            drawStickerLayer(revCtx, PIC_WIDTH, PIC_HEIGHT, currentSticker, capturedFaceAnchors);
+        }
+
+        // ============================================================================
+        // FACE-TRACKED STICKER DRAWING ENGINE
+        // ============================================================================
+        function drawStickerLayer(ctx, w, h, stickerType, faceList) {
+            if (stickerType === 'none') return;
+
+            if (stickerType === 'datestamp') {
+                ctx.save();
+                const fontSize = Math.round((w / 540) * 22);
+                ctx.font = `700 ${fontSize}px "Courier New", monospace`;
+                ctx.fillStyle = '#FF7A00';
+                ctx.shadowColor = '#FF3300';
+                ctx.shadowBlur = 8;
+                ctx.textAlign = 'right';
+                ctx.fillText("'26 11 02", w * 0.93, h * 0.91);
+                ctx.restore();
+                return;
+            }
+
+            const facesToRender = (faceList && faceList.length > 0) ? faceList : getFallbackFaceAnchor(w, h);
+
+            facesToRender.forEach(face => {
+                ctx.save();
+                ctx.translate(face.eyeCenterX, face.eyeCenterY);
+                ctx.rotate(face.angle);
+
+                const scale = Math.max(0.55, Math.min(2.2, face.eyeDist / 95));
+
+                if (stickerType === 'hearts') {
+                    const crownHearts = [
+                        { ox: -135, oy: -75,  size: 22, rot: -0.35, color: '#FF5C9E', alpha: 0.88 },
+                        { ox: -112, oy: -112, size: 28, rot: -0.25, color: '#FF85B8', alpha: 0.82 },
+                        { ox: -75,  oy: -98,  size: 20, rot: -0.15, color: '#FF3385', alpha: 0.92 },
+                        { ox: -38,  oy: -132, size: 25, rot: -0.08, color: '#FF4D94', alpha: 0.90 },
+                        { ox: 6,    oy: -138, size: 34, rot: 0.05,  color: '#E62E7A', alpha: 0.94 },
+                        { ox: -6,   oy: -120, size: 22, rot: -0.10, color: '#FF70A6', alpha: 0.88 },
+                        { ox: 62,   oy: -116, size: 32, rot: 0.18,  color: '#FF4791', alpha: 0.92 },
+                        { ox: 88,   oy: -85,  size: 17, rot: 0.22,  color: '#FF70A6', alpha: 0.90 },
+                        { ox: 126,  oy: -88,  size: 22, rot: 0.32,  color: '#FF3385', alpha: 0.86 }
+                    ];
+
+                    crownHearts.forEach(hItem => {
+                        drawSoftHeart(
+                            ctx,
+                            hItem.ox * scale,
+                            hItem.oy * scale,
+                            hItem.size * scale,
+                            hItem.rot,
+                            hItem.color,
+                            hItem.alpha
+                        );
+                    });
+                } else if (stickerType === 'blush') {
+                    drawCheekBlush(ctx, -56 * scale, 36 * scale, 32 * scale);
+                    drawCheekBlush(ctx, 56 * scale,  36 * scale, 32 * scale);
+                    drawSoftHeart(ctx, -110 * scale, 10 * scale, 17 * scale, -0.25, '#FF5C9E', 0.88);
+                    drawSoftHeart(ctx, 110 * scale,  10 * scale, 17 * scale, 0.25,  '#FF5C9E', 0.88);
+                } else if (stickerType === 'bows') {
+                    drawRibbonBow(ctx, -125 * scale, -95 * scale, 30 * scale, -0.20);
+                    drawRibbonBow(ctx, 125 * scale,  -95 * scale, 30 * scale, 0.20);
+                    drawSoftHeart(ctx, 0, -135 * scale, 18 * scale, 0, '#FF70A6', 0.88);
+                } else if (stickerType === 'sparkles') {
+                    const haloSparkles = [
+                        { ox: -145, oy: -90,  size: 24, color: '#FFF9D2' },
+                        { ox: -105, oy: -145, size: 15, color: '#FFFFFF' },
+                        { ox: 145,  oy: -95,  size: 26, color: '#FFF9D2' },
+                        { ox: 110,  oy: -140, size: 15, color: '#FFFFFF' },
+                        { ox: -155, oy: 30,   size: 20, color: '#FFFFFF' },
+                        { ox: 155,  oy: 35,   size: 22, color: '#FFF9D2' },
+                        { ox: 0,    oy: -160, size: 18, color: '#FFD6E8' }
+                    ];
+                    haloSparkles.forEach(sp => {
+                        drawFourPointStar(ctx, sp.ox * scale, sp.oy * scale, sp.size * scale, sp.color);
+                    });
+                }
+
+                ctx.restore();
+            });
+        }
+
+        function drawSoftHeart(ctx, cx, cy, size, angle, color, alpha) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = size * 0.35;
+
+            ctx.beginPath();
+            const topCurveHeight = size * 0.3;
+            ctx.moveTo(0, topCurveHeight);
+            ctx.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
+            ctx.bezierCurveTo(-size / 2, (size + topCurveHeight) / 2, 0, (size + topCurveHeight) / 1.45, 0, size);
+            ctx.bezierCurveTo(0, (size + topCurveHeight) / 1.45, size / 2, (size + topCurveHeight) / 2, size / 2, topCurveHeight);
+            ctx.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawFourPointStar(ctx, cx, cy, size, color) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.fillStyle = color;
+            ctx.shadowColor = '#FFFFFF';
+            ctx.shadowBlur = 10;
+
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.quadraticCurveTo(0, 0, size, 0);
+            ctx.quadraticCurveTo(0, 0, 0, size);
+            ctx.quadraticCurveTo(0, 0, -size, 0);
+            ctx.quadraticCurveTo(0, 0, 0, -size);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawCheekBlush(ctx, cx, cy, radius) {
+            ctx.save();
+            const grad = ctx.createRadialGradient(cx, cy, radius * 0.1, cx, cy, radius);
+            grad.addColorStop(0, 'rgba(255, 90, 145, 0.58)');
+            grad.addColorStop(1, 'rgba(255, 90, 145, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(255, 75, 130, 0.55)';
+            ctx.lineWidth = Math.max(1.5, radius * 0.06);
+            ctx.lineCap = 'round';
+            const step = radius * 0.24;
+            for (let i = -1; i <= 1; i++) {
+                ctx.beginPath();
+                ctx.moveTo(cx + i * step - 3, cy + 4);
+                ctx.lineTo(cx + i * step + 3, cy - 4);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        function drawRibbonBow(ctx, cx, cy, size, angle) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+            ctx.fillStyle = '#FF85B8';
+            ctx.strokeStyle = '#E62E7A';
+            ctx.lineWidth = Math.max(1.5, size * 0.06);
+            ctx.shadowColor = 'rgba(230, 46, 122, 0.3)';
+            ctx.shadowBlur = 6;
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-size, -size * 0.7, -size, size * 0.7, 0, 0);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(size, -size * 0.7, size, size * 0.7, 0, 0);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(-3, 2);
+            ctx.quadraticCurveTo(-size * 0.4, size * 0.8, -size * 0.6, size * 0.9);
+            ctx.lineTo(-size * 0.3, size * 0.95);
+            ctx.quadraticCurveTo(-size * 0.2, size * 0.6, 0, 4);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(3, 2);
+            ctx.quadraticCurveTo(size * 0.4, size * 0.8, size * 0.6, size * 0.9);
+            ctx.lineTo(size * 0.3, size * 0.95);
+            ctx.quadraticCurveTo(size * 0.2, size * 0.6, 0, 4);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.18, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF5C9E';
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
         function setTimer(seconds) {
             countdownTime = seconds;
 
@@ -294,10 +679,10 @@
             timers.forEach(t => {
                 const el = document.getElementById(`btn-timer-${t}`);
                 if (t === seconds) {
-                    el.classList.add('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.add('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-sm');
                     el.classList.remove('text-gray-500', 'hover:text-[#4A0404]');
                 } else {
-                    el.classList.remove('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.remove('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-sm');
                     el.classList.add('text-gray-500', 'hover:text-[#4A0404]');
                 }
             });
@@ -305,13 +690,16 @@
 
         async function initCamera() {
             errorOverlay.classList.add('hidden');
-            render4x6PaperCanvas(); // Draw initial empty 4x6 paper slots
+            render4x6PaperCanvas();
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
                     video: { width: { ideal: 1440 }, height: { ideal: 960 }, facingMode: "user" }, 
                     audio: false 
                 });
                 video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    requestAnimationFrame(trackFacesLoop);
+                };
                 startBtn.disabled = false;
                 statusText.classList.remove('opacity-0');
             } catch (err) {
@@ -341,7 +729,6 @@
         async function startPhotoSequence() {
             if (!stream) return;
 
-            // If 4x6 paper already has 4 strips, start a fresh 4x6 sheet automatically
             if (completedStrips.length >= STRIPS_PER_PAPER) {
                 completedStrips = [];
                 await render4x6PaperCanvas();
@@ -357,7 +744,6 @@
             progressIndicator.classList.remove('hidden');
             statusText.innerText = `Capturing Strip ${currentStripNumber} of ${STRIPS_PER_PAPER}...`;
 
-            // Capture 2 Photos for the current 2"x3" Strip
             for (let i = 0; i < PHOTOS_PER_STRIP; i++) {
                 progressIndicator.innerText = `Photo ${i + 1} / ${PHOTOS_PER_STRIP}`;
                 let frameAccepted = false;
@@ -366,12 +752,13 @@
                     await runCountdown();
                     triggerFlash();
                     
+                    capturedFaceAnchors = JSON.parse(JSON.stringify(liveFaces));
                     const frameDataUrl = captureFrame(); 
                     const action = await showReviewUI(frameDataUrl, i === PHOTOS_PER_STRIP - 1);
                     
                     if (action === 'keep') {
-                        const filteredFrameUrl = await applyCurrentFilterToDataUrl(frameDataUrl);
-                        capturedFrames.push(filteredFrameUrl);
+                        const finalFrameUrl = await applyCurrentFilterAndStickerToDataUrl(frameDataUrl, capturedFaceAnchors);
+                        capturedFrames.push(finalFrameUrl);
                         frameAccepted = true;
                         
                         if (i < PHOTOS_PER_STRIP - 1) {
@@ -388,7 +775,6 @@
             progressIndicator.classList.add('hidden');
             statusText.innerText = `Adding Strip ${currentStripNumber} to 4×6 paper...`;
             
-            // Build the single 2"x3" strip and add it to the 4"x6" sheet
             const singleStripDataUrl = await generateSingle2x3Strip();
             completedStrips.push(singleStripDataUrl);
             downloadSingleBtn.disabled = false;
@@ -396,7 +782,6 @@
             await render4x6PaperCanvas();
             updateUIForNextStrip();
 
-            // On phones, show the updated 4x6 paper preview
             if (window.innerWidth < 768) {
                 openMobileResult();
             }
@@ -431,6 +816,7 @@
             return new Promise((resolve) => {
                 reviewImage.src = dataUrl;
                 reviewImage.style.filter = filterMap[currentFilter];
+                updateReviewStickerPreview();
                 reviewOverlay.classList.remove('hidden');
                 btnKeep.innerText = isLast ? "Finish Strip" : "Keep & Next Pose";
                 reviewResolve = resolve;
@@ -485,29 +871,56 @@
         function captureFrame() {
             const vWidth = video.videoWidth;
             const vHeight = video.videoHeight;
-            tempCanvas.width = vWidth;
-            tempCanvas.height = vHeight;
+            tempCanvas.width = PIC_WIDTH;
+            tempCanvas.height = PIC_HEIGHT;
             const ctx = tempCanvas.getContext('2d');
-            
-            // Mirror image horizontally
-            ctx.translate(vWidth, 0);
+
+            const sRatio = vWidth / vHeight;
+            const dRatio = PIC_WIDTH / PIC_HEIGHT;
+            let sx = 0, sy = 0, sw = vWidth, sh = vHeight;
+
+            if (sRatio > dRatio) {
+                sw = vHeight * dRatio;
+                sx = (vWidth - sw) / 2;
+            } else {
+                sh = vWidth / dRatio;
+                sy = (vHeight - sh) / 2;
+            }
+
+            ctx.translate(PIC_WIDTH, 0);
             ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0, vWidth, vHeight);
+            ctx.drawImage(video, sx, sy, sw, sh, 0, 0, PIC_WIDTH, PIC_HEIGHT);
             
             return tempCanvas.toDataURL('image/jpeg', 1.0);
         }
 
-        function applyCurrentFilterToDataUrl(dataUrl) {
+        function applyCurrentFilterAndStickerToDataUrl(dataUrl, faceAnchors) {
             return new Promise((resolve) => {
                 const img = new Image();
                 img.onload = () => {
                     const ctx = tempCanvas.getContext('2d');
-                    tempCanvas.width = img.width;
-                    tempCanvas.height = img.height;
+                    tempCanvas.width = PIC_WIDTH;
+                    tempCanvas.height = PIC_HEIGHT;
                     
                     ctx.filter = filterMap[currentFilter];
-                    ctx.drawImage(img, 0, 0);
+                    ctx.drawImage(img, 0, 0, PIC_WIDTH, PIC_HEIGHT);
                     ctx.filter = 'none';
+
+                    if (currentFilter === 'vintage') {
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'multiply';
+                        const grad = ctx.createRadialGradient(
+                            PIC_WIDTH / 2, PIC_HEIGHT / 2, PIC_WIDTH * 0.18,
+                            PIC_WIDTH / 2, PIC_HEIGHT / 2, PIC_WIDTH * 0.75
+                        );
+                        grad.addColorStop(0, 'rgba(65, 40, 25, 0.08)');
+                        grad.addColorStop(1, 'rgba(45, 25, 12, 0.28)');
+                        ctx.fillStyle = grad;
+                        ctx.fillRect(0, 0, PIC_WIDTH, PIC_HEIGHT);
+                        ctx.restore();
+                    }
+
+                    drawStickerLayer(ctx, PIC_WIDTH, PIC_HEIGHT, currentSticker, faceAnchors);
                     
                     resolve(tempCanvas.toDataURL('image/jpeg', 0.98));
                 };
@@ -520,11 +933,10 @@
         // ============================================================================
         function generateSingle2x3Strip() {
             return new Promise((resolve) => {
-                singleStripCanvas.width = STRIP_WIDTH;   // 600px (2 inches)
-                singleStripCanvas.height = STRIP_HEIGHT; // 900px (3 inches)
+                singleStripCanvas.width = STRIP_WIDTH;
+                singleStripCanvas.height = STRIP_HEIGHT;
                 const ctx = singleStripCanvas.getContext('2d');
 
-                // Deep Maroon Theme Background (#4A0404)
                 ctx.fillStyle = STRIP_BG_COLOR;
                 ctx.fillRect(0, 0, STRIP_WIDTH, STRIP_HEIGHT);
 
@@ -537,15 +949,12 @@
                         images[index] = img;
                         loadedImages++;
                         if (loadedImages === PHOTOS_PER_STRIP) {
-                            // Draw Photo 1 and Photo 2 at exact 1.8" x 1.2" (540px x 360px) size
                             images.forEach((photoImg, i) => {
                                 const yPos = TOP_MARGIN + (i * (PIC_HEIGHT + PHOTO_GAP));
-                                drawCroppedImage(ctx, photoImg, SIDE_MARGIN, yPos, PIC_WIDTH, PIC_HEIGHT);
+                                ctx.drawImage(photoImg, SIDE_MARGIN, yPos, PIC_WIDTH, PIC_HEIGHT);
                             });
 
-                            // Draw Event Branding Footer ("NCC INTEGRATIONAL ACTIVITY" / "2026")
                             drawStripFooterText(ctx, STRIP_WIDTH / 2);
-
                             resolve(singleStripCanvas.toDataURL('image/jpeg', 0.98));
                         }
                     };
@@ -554,32 +963,13 @@
             });
         }
 
-        function drawCroppedImage(ctx, img, x, y, width, height) {
-            // Center Crop Math to fit 1.8" x 1.2" (3:2 ratio) without stretching
-            const sRatio = img.width / img.height;
-            const dRatio = width / height;
-            let sx = 0, sy = 0, sw = img.width, sh = img.height;
-
-            if (sRatio > dRatio) {
-                sw = img.height * dRatio;
-                sx = (img.width - sw) / 2;
-            } else {
-                sh = img.width / dRatio;
-                sy = (img.height - sh) / 2;
-            }
-
-            ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
-        }
-
         function drawStripFooterText(ctx, centerX) {
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
 
-            // Line 1: Bold Uppercase Sans-Serif ("NCC INTEGRATIONAL ACTIVITY")
             ctx.font = '900 30px "Inter", sans-serif';
             ctx.fillText(EVENT_NAME, centerX, 822);
 
-            // Line 2: Italic Serif ("2026")
             ctx.font = 'italic 44px "Playfair Display", serif';
             ctx.fillText(EVENT_DATE, centerX, 870);
         }
@@ -589,28 +979,24 @@
         // ============================================================================
         function render4x6PaperCanvas() {
             return new Promise((resolve) => {
-                paperCanvas.width = PAPER_WIDTH;   // 1200px (4 inches)
-                paperCanvas.height = PAPER_HEIGHT; // 1800px (6 inches)
+                paperCanvas.width = PAPER_WIDTH;
+                paperCanvas.height = PAPER_HEIGHT;
                 const ctx = paperCanvas.getContext('2d');
 
-                // Fill paper background
                 ctx.fillStyle = '#F3EFEA';
                 ctx.fillRect(0, 0, PAPER_WIDTH, PAPER_HEIGHT);
 
-                // Coordinates for the 4 slots (2 columns x 2 rows of 600x900 strips)
                 const slots = [
-                    { x: 0,           y: 0,            label: "STRIP 1" }, // Top-Left
-                    { x: STRIP_WIDTH, y: 0,            label: "STRIP 2" }, // Top-Right
-                    { x: 0,           y: STRIP_HEIGHT, label: "STRIP 3" }, // Bottom-Left
-                    { x: STRIP_WIDTH, y: STRIP_HEIGHT, label: "STRIP 4" }  // Bottom-Right
+                    { x: 0,           y: 0,            label: "STRIP 1" },
+                    { x: STRIP_WIDTH, y: 0,            label: "STRIP 2" },
+                    { x: 0,           y: STRIP_HEIGHT, label: "STRIP 3" },
+                    { x: STRIP_WIDTH, y: STRIP_HEIGHT, label: "STRIP 4" }
                 ];
 
-                // Draw placeholder slots first
-                slots.forEach((slot, idx) => {
+                slots.forEach((slot) => {
                     ctx.fillStyle = '#EAE4DC';
                     ctx.fillRect(slot.x, slot.y, STRIP_WIDTH, STRIP_HEIGHT);
 
-                    // Placeholder text for empty slots
                     ctx.fillStyle = '#9CA3AF';
                     ctx.textAlign = 'center';
                     ctx.font = '700 32px "Inter", sans-serif';
@@ -626,7 +1012,6 @@
                     return;
                 }
 
-                // Draw each completed strip into its slot
                 let loaded = 0;
                 completedStrips.forEach((stripDataUrl, index) => {
                     const img = new Image();
@@ -646,17 +1031,14 @@
         }
 
         function drawCuttingGuides(ctx) {
-            // Subtle 1px trim guide lines down the center (x = 600) and middle (y = 900)
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
             ctx.lineWidth = 2;
 
-            // Vertical center cut line
             ctx.beginPath();
             ctx.moveTo(STRIP_WIDTH, 0);
             ctx.lineTo(STRIP_WIDTH, PAPER_HEIGHT);
             ctx.stroke();
 
-            // Horizontal middle cut line
             ctx.beginPath();
             ctx.moveTo(0, STRIP_HEIGHT);
             ctx.lineTo(PAPER_WIDTH, STRIP_HEIGHT);
