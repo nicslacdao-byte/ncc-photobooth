@@ -2,14 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chic Photo Booth</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chic Photo Booth - 4x6 Print Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800;900&family=Playfair+Display:ital,wght@0,400;1,400;1,600&display=swap" rel="stylesheet">
     <style>
-        body {
+        /* Lock page to exact screen resolution on any monitor or phone */
+        html, body {
             font-family: 'Inter', sans-serif;
-            background-color: #FDFBF7; /* Stockholm chic cream */
+            background-color: #FDFBF7;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
         }
         
         .font-serif {
@@ -22,12 +28,12 @@
             transition: filter 0.3s ease;
         }
         
-        /* Photo Strip container styling for display */
-        .photo-strip-display {
-            background: #FDFBF7;
-            padding: 12px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            border: 1px solid rgba(128, 0, 32, 0.1);
+        /* 4x6 Photo Paper container styling for display */
+        .photo-paper-display {
+            background: #FFFFFF;
+            padding: 8px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(74, 4, 4, 0.2);
         }
 
         /* Countdown Animation */
@@ -49,134 +55,157 @@
             opacity: 0 !important;
             transition: opacity 0.8s ease-in;
         }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #D1D5DB; }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 flex flex-col items-center py-10 px-4 selection:bg-[#800020] selection:text-white">
+<body class="text-gray-800 flex flex-col items-center justify-between py-2.5 px-4 md:py-5 md:px-8 selection:bg-[#4A0404] selection:text-white">
 
     <!-- Header -->
-    <header class="text-center mb-8">
-        <h1 class="text-4xl font-serif text-[#800020] tracking-wider mb-2">Atelier Booth</h1>
-        <p class="text-gray-500 font-light text-sm tracking-[0.2em] uppercase">Capture the sequence</p>
+    <header class="text-center shrink-0 mb-1.5 md:mb-3">
+        <h1 class="text-xl md:text-3xl font-serif text-[#4A0404] tracking-wider">Atelier Booth</h1>
+        <p class="text-gray-500 font-light text-[10px] md:text-xs tracking-[0.18em] uppercase">
+            2"×3" Strip (1.8"×1.2" Photos) • 4 Strips per 4"×6" Paper
+        </p>
     </header>
 
-    <!-- Main Content Grid -->
-    <main class="w-full max-w-5xl flex flex-col md:flex-row gap-10 items-start justify-center">
+    <!-- Main Content Area -->
+    <main class="w-full max-w-6xl flex-1 min-h-0 flex flex-col md:flex-row gap-4 md:gap-8 items-center justify-center">
         
         <!-- Left: Camera View & Controls -->
-        <div class="flex flex-col items-center w-full md:w-1/2 md:sticky md:top-10">
-            <!-- Camera Container -->
-            <div class="relative w-full aspect-[4/3] bg-gray-200 rounded-xl overflow-hidden shadow-lg border-2 border-transparent transition-colors mb-6">
+        <div class="flex flex-col items-center justify-center w-full md:w-3/5 h-full min-h-0">
+            
+            <!-- Strip Queue Status Bar -->
+            <div class="flex items-center justify-between w-full max-w-[600px] mb-2 px-1">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-[#4A0404]">4×6 Paper Progress:</span>
+                    <span id="sheet-counter-badge" class="bg-[#4A0404] text-white text-xs font-bold px-2.5 py-0.5 rounded-full">0 / 4 Strips</span>
+                </div>
+                <button onclick="openMobileResult()" class="md:hidden text-xs font-medium text-[#4A0404] underline">
+                    View 4×6 Paper
+                </button>
+            </div>
+
+            <!-- Camera Container: 3:2 Aspect Ratio to match 1.8" x 1.2" Picture Dimension -->
+            <div class="relative w-full max-w-[600px] max-h-[44dvh] md:max-h-[52dvh] aspect-[3/2] bg-gray-200 rounded-xl overflow-hidden shadow-lg border-2 border-[#4A0404]/20 transition-colors mb-2.5 md:mb-4 flex items-center justify-center">
                 <!-- Video Feed -->
                 <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
                 
                 <!-- Countdown Overlay -->
-                <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-[#800020]/10 backdrop-blur-[2px] hidden z-10">
-                    <span id="countdown-text" class="text-9xl text-[#FDFBF7] font-serif font-bold drop-shadow-[0_4px_4px_rgba(128,0,32,0.5)]"></span>
+                <div id="countdown-overlay" class="absolute inset-0 flex items-center justify-center bg-[#4A0404]/20 backdrop-blur-[2px] hidden z-10">
+                    <span id="countdown-text" class="text-7xl md:text-9xl text-[#FDFBF7] font-serif font-bold drop-shadow-[0_4px_4px_rgba(74,4,4,0.6)]"></span>
                 </div>
 
                 <!-- Flash Overlay -->
                 <div id="flash-overlay" class="absolute inset-0 bg-white opacity-0 pointer-events-none z-20"></div>
 
-                <!-- Progress Indicator -->
-                <div id="progress-indicator" class="absolute top-4 right-4 bg-[#800020] text-[#FDFBF7] px-3 py-1 rounded-full text-sm font-medium hidden z-10 tracking-widest shadow-md">
-                    1 / 4
+                <!-- Progress Indicator (2 photos per strip) -->
+                <div id="progress-indicator" class="absolute top-3 right-3 bg-[#4A0404] text-[#FDFBF7] px-3 py-1 rounded-full text-xs md:text-sm font-medium hidden z-10 tracking-widest shadow-md">
+                    Photo 1 / 2
                 </div>
 
                 <!-- Error Overlay -->
-                <div id="error-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#FDFBF7] p-6 text-center hidden z-30">
-                    <svg class="w-12 h-12 text-[#800020] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div id="error-overlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#FDFBF7] p-4 text-center hidden z-30">
+                    <svg class="w-10 h-10 text-[#4A0404] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                         <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></line>
                     </svg>
-                    <p class="text-[#800020] font-serif text-lg mb-1">Camera Access Denied</p>
-                    <p class="text-sm text-gray-500 mb-4">Please allow camera access in your browser.</p>
-                    <button onclick="initCamera()" class="px-5 py-2 text-sm border border-[#800020] text-[#800020] rounded-full hover:bg-[#800020] hover:text-[#FDFBF7] transition-colors duration-300">
+                    <p class="text-[#4A0404] font-serif text-base md:text-lg mb-1">Camera Access Denied</p>
+                    <p class="text-xs text-gray-500 mb-3">Please allow camera access in your browser.</p>
+                    <button onclick="initCamera()" class="px-4 py-1.5 text-xs md:text-sm border border-[#4A0404] text-[#4A0404] rounded-full hover:bg-[#4A0404] hover:text-[#FDFBF7] transition-colors duration-300">
                         Try Again
                     </button>
                 </div>
 
-                <!-- Review Overlay (State Machine: Review Phase) -->
-                <div id="review-overlay" class="absolute inset-0 bg-[#FDFBF7]/90 backdrop-blur-sm flex flex-col items-center justify-between hidden z-20 p-6">
-                    <img id="review-image" src="" alt="Review" class="w-full h-[75%] object-cover rounded-lg border-2 border-[#800020]/20 shadow-xl">
-                    <div class="flex gap-4 w-full max-w-sm mt-4">
-                        <button onclick="resolveReview('recapture')" class="flex-1 py-3 text-sm font-medium rounded-full border-2 border-[#800020] text-[#800020] bg-transparent hover:bg-[#800020] hover:text-[#FDFBF7] transition-colors shadow-sm">Recapture</button>
-                        <button onclick="resolveReview('keep')" id="btn-keep" class="flex-1 py-3 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md hover:bg-[#600018] transition-colors">Keep</button>
+                <!-- Review Overlay -->
+                <div id="review-overlay" class="absolute inset-0 bg-[#FDFBF7]/95 backdrop-blur-sm flex flex-col items-center justify-between hidden z-20 p-3 md:p-4">
+                    <img id="review-image" src="" alt="Review" class="w-full h-[76%] object-cover rounded-lg border-2 border-[#4A0404]/20 shadow-md">
+                    <div class="flex gap-3 w-full max-w-xs mt-2">
+                        <button onclick="resolveReview('recapture')" class="flex-1 py-2 text-xs md:text-sm font-medium rounded-full border-2 border-[#4A0404] text-[#4A0404] bg-transparent hover:bg-[#4A0404] hover:text-[#FDFBF7] transition-colors shadow-sm">Recapture</button>
+                        <button onclick="resolveReview('keep')" id="btn-keep" class="flex-1 py-2 text-xs md:text-sm font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md hover:bg-[#350202] transition-colors">Keep</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Layout Selector -->
-            <div class="w-full flex flex-col items-center mb-6">
-                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Select Layout</p>
-                <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-md">
-                    <button onclick="setLayout('polaroid')" id="btn-polaroid" class="flex-1 py-2 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Polaroid</button>
-                    <button onclick="setLayout('strip')" id="btn-strip" class="flex-1 py-2 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Strip</button>
-                    <button onclick="setLayout('4r')" id="btn-4r" class="flex-1 py-2 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">4R Classic</button>
+            <!-- Controls Panel -->
+            <div class="w-full max-w-md flex flex-col items-center shrink-0">
+                <!-- Filter Selector -->
+                <div class="w-full flex flex-col items-center mb-2 md:mb-3">
+                    <p class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mb-1 font-medium">Select Filter</p>
+                    <div class="flex flex-wrap justify-center gap-1.5 md:gap-2 w-full">
+                        <button onclick="setFilter('normal')" id="btn-filter-normal" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors border border-transparent">Normal</button>
+                        <button onclick="setFilter('bw')" id="btn-filter-bw" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">B&W</button>
+                        <button onclick="setFilter('vintage')" id="btn-filter-vintage" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Vintage</button>
+                        <button onclick="setFilter('y2k')" id="btn-filter-y2k" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Y2K</button>
+                        <button onclick="setFilter('cool')" id="btn-filter-cool" class="px-3 py-1 md:px-3.5 md:py-1 text-xs font-medium rounded-full text-gray-500 bg-white hover:text-[#4A0404] border border-gray-200 transition-colors">Cool</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Filter Selector (Active during review phase) -->
-            <div class="w-full flex flex-col items-center mb-6">
-                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Select Filter</p>
-                <div class="flex flex-wrap justify-center gap-2 w-full max-w-md">
-                    <button onclick="setFilter('normal')" id="btn-filter-normal" class="px-4 py-1.5 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors border border-transparent">Normal</button>
-                    <button onclick="setFilter('bw')" id="btn-filter-bw" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">B&W</button>
-                    <button onclick="setFilter('vintage')" id="btn-filter-vintage" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Vintage</button>
-                    <button onclick="setFilter('y2k')" id="btn-filter-y2k" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Y2K</button>
-                    <button onclick="setFilter('cool')" id="btn-filter-cool" class="px-4 py-1.5 text-sm font-medium rounded-full text-gray-500 bg-white hover:text-[#800020] border border-gray-200 transition-colors">Cool</button>
+                <!-- Timer Selector -->
+                <div class="w-full flex flex-col items-center mb-2.5 md:mb-4">
+                    <p class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 mb-1 font-medium">Timer Delay</p>
+                    <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-xs">
+                        <button onclick="setTimer(3)" id="btn-timer-3" class="flex-1 py-1 text-xs font-medium rounded-full bg-[#4A0404] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">3s</button>
+                        <button onclick="setTimer(5)" id="btn-timer-5" class="flex-1 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">5s</button>
+                        <button onclick="setTimer(10)" id="btn-timer-10" class="flex-1 py-1 text-xs font-medium rounded-full text-gray-500 hover:text-[#4A0404] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">10s</button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Timer Selector -->
-            <div class="w-full flex flex-col items-center mb-6">
-                <p class="text-xs uppercase tracking-widest text-gray-500 mb-3 font-medium">Timer Delay</p>
-                <div class="flex bg-white rounded-full p-1 shadow-sm border border-gray-200 w-full max-w-sm">
-                    <button onclick="setTimer(3)" id="btn-timer-3" class="flex-1 py-1.5 text-sm font-medium rounded-full bg-[#800020] text-[#FDFBF7] shadow-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed">3s</button>
-                    <button onclick="setTimer(5)" id="btn-timer-5" class="flex-1 py-1.5 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">5s</button>
-                    <button onclick="setTimer(10)" id="btn-timer-10" class="flex-1 py-1.5 text-sm font-medium rounded-full text-gray-500 hover:text-[#800020] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">10s</button>
-                </div>
+                <!-- Start Button -->
+                <button id="start-btn" onclick="startPhotoSequence()" class="bg-[#4A0404] text-[#FDFBF7] px-8 py-2.5 md:px-10 md:py-3 rounded-full text-xs md:text-sm font-medium tracking-widest uppercase shadow-xl shadow-[#4A0404]/20 hover:bg-[#350202] transition-all duration-300 w-full max-w-xs sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
+                    Capture Strip 1 of 4
+                </button>
+                <p id="status-text" class="text-xs text-gray-500 mt-1 h-4 opacity-0 transition-opacity">Ready for Strip 1...</p>
             </div>
-
-            <!-- Start Button -->
-            <button id="start-btn" onclick="startPhotoSequence()" class="bg-[#800020] text-[#FDFBF7] px-10 py-4 rounded-full font-medium tracking-widest uppercase shadow-xl shadow-[#800020]/20 hover:bg-[#600018] hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">
-                Start Booth
-            </button>
-            <p id="status-text" class="text-sm text-gray-500 mt-4 h-5 opacity-0 transition-opacity">Sequence ready...</p>
         </div>
 
-        <!-- Right: Photo Strip Result -->
-        <div id="result-container" class="flex flex-col items-center w-full md:w-1/2 opacity-0 transition-opacity duration-1000 hidden md:flex">
+        <!-- Right: 4" x 6" Photo Paper Result (Holds 4 strips of 2" x 3") -->
+        <div id="result-container" class="fixed inset-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-md md:static md:bg-transparent md:backdrop-blur-none flex flex-col items-center justify-center w-full md:w-2/5 h-full min-h-0 p-4 md:p-0 transition-opacity duration-300 hidden md:flex">
             
-            <div class="w-full max-w-[320px] flex flex-col items-center">
-                <!-- Final Photo Strip Image -->
-                <div class="photo-strip-display mb-6 transform rotate-1 hover:rotate-0 transition-transform duration-500 w-full">
-                    <img id="photo-result" src="" alt="Your Photo Strip" class="w-full h-auto block shadow-sm border border-gray-200">
+            <div class="h-full max-h-[88dvh] md:max-h-full w-full flex flex-col items-center justify-center">
+                <div class="flex items-center justify-between w-full max-w-[300px] mb-1.5">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">4" × 6" Photo Paper (4 Strips)</span>
+                    <button onclick="resetPaperSheet()" class="text-xs text-red-700 hover:underline font-medium">Reset Sheet</button>
                 </div>
 
-                <button id="download-btn" onclick="downloadPhotoStrip()" class="border-2 border-[#800020] text-[#800020] bg-transparent px-8 py-3 rounded-full font-medium tracking-wide hover:bg-[#800020] hover:text-[#FDFBF7] transition-all duration-300 w-full focus:outline-none flex items-center justify-center gap-2 shadow-md">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    Download Output
-                </button>
+                <!-- 4x6 Photo Paper Preview Canvas Image -->
+                <div class="photo-paper-display mb-3 flex items-center justify-center max-h-[60dvh]">
+                    <img id="paper-result" src="" alt="4x6 Photo Paper Preview" class="max-h-[56dvh] w-auto aspect-[2/3] object-contain block border border-gray-200">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col gap-2 w-full max-w-[300px] shrink-0">
+                    <div class="flex gap-2 w-full">
+                        <!-- Take Next Strip Button (For Mobile / Quick Workflow) -->
+                        <button id="next-strip-btn" onclick="closeMobileResult()" class="md:hidden flex-1 border-2 border-gray-300 text-gray-700 bg-white px-3 py-2 rounded-full text-xs font-medium tracking-wide hover:bg-gray-100 transition-all">
+                            Back to Camera
+                        </button>
+
+                        <!-- Download Full 4x6 Photo Paper Button -->
+                        <button id="download-paper-btn" onclick="download4x6Paper()" class="flex-1 bg-[#4A0404] text-[#FDFBF7] px-4 py-2.5 rounded-full text-xs md:text-sm font-medium tracking-wide hover:bg-[#350202] transition-all duration-300 flex items-center justify-center gap-1.5 shadow-md">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            Download 4×6 Paper
+                        </button>
+                    </div>
+
+                    <!-- Download Latest Single 2x3 Strip Button -->
+                    <button id="download-single-btn" onclick="downloadLatestSingleStrip()" disabled class="w-full border border-[#4A0404] text-[#4A0404] bg-transparent px-4 py-1.5 rounded-full text-xs font-medium tracking-wide hover:bg-[#4A0404] hover:text-[#FDFBF7] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed">
+                        Download Latest Single Strip (2"×3")
+                    </button>
+                </div>
             </div>
             
-            <!-- Hidden Canvas for intermediate captures -->
+            <!-- Hidden Canvases -->
             <canvas id="temp-canvas" class="hidden"></canvas>
-            <!-- Hidden Canvas for final strip generation -->
-            <canvas id="strip-canvas" class="hidden"></canvas>
+            <canvas id="single-strip-canvas" class="hidden"></canvas>
+            <canvas id="paper-canvas" class="hidden"></canvas>
         </div>
     </main>
 
     <script>
         const video = document.getElementById('camera-stream');
         const tempCanvas = document.getElementById('temp-canvas');
-        const stripCanvas = document.getElementById('strip-canvas');
-        const photoResult = document.getElementById('photo-result');
+        const singleStripCanvas = document.getElementById('single-strip-canvas');
+        const paperCanvas = document.getElementById('paper-canvas');
+        const paperResult = document.getElementById('paper-result');
         const startBtn = document.getElementById('start-btn');
         const statusText = document.getElementById('status-text');
         const errorOverlay = document.getElementById('error-overlay');
@@ -188,11 +217,16 @@
         const reviewOverlay = document.getElementById('review-overlay');
         const reviewImage = document.getElementById('review-image');
         const btnKeep = document.getElementById('btn-keep');
+        const sheetCounterBadge = document.getElementById('sheet-counter-badge');
+        const downloadSingleBtn = document.getElementById('download-single-btn');
         
         let stream = null;
         let capturedFrames = [];
-        let currentLayout = 'strip'; // 'polaroid', 'strip', '4r'
-        let photosRequired = 4;
+        let completedStrips = []; // Holds up to 4 dataURLs of 2"x3" strips to fill one 4"x6" photo paper
+        
+        const PHOTOS_PER_STRIP = 2; // 2 photos per strip as shown in your reference image
+        const STRIPS_PER_PAPER = 4; // 4 strips (2x3) fill one 4x6 photo paper
+        
         let currentFilter = 'normal';
         let countdownTime = 3;
         let reviewResolve = null;
@@ -205,33 +239,32 @@
             'cool': 'sepia(30%) hue-rotate(180deg) saturate(150%)'
         };
 
-        // Configuration for the final generated output
-        const STRIP_BG_COLOR = '#442b23'; // Dark brown base as requested
-        const FRAME_WIDTH = 600;
-        const FRAME_HEIGHT = 450;
-        const PADDING = 30; // Padding around and between frames
-        const BOTTOM_MARGIN = 150; // Extra space at bottom for event text
+        // ============================================================================
+        // EXACT PRINT DIMENSIONS AT 300 DPI (Dots Per Inch)
+        // ============================================================================
+        const DPI = 300;
+        
+        // 1. Picture Dimension: W: 1.8", H: 1.2" -> 540px x 360px
+        const PIC_WIDTH = Math.round(1.8 * DPI);  // 540px
+        const PIC_HEIGHT = Math.round(1.2 * DPI); // 360px
 
-        // Hardware Constants
-        const EVENT_NAME = "NCC INTERGRATIONAL ACTIVITY";
+        // 2. Strip Size: W: 2.0", H: 3.0" -> 600px x 900px
+        const STRIP_WIDTH = Math.round(2.0 * DPI);  // 600px
+        const STRIP_HEIGHT = Math.round(3.0 * DPI); // 900px
+
+        // 3. Photo Paper Size: W: 4.0", H: 6.0" -> 1200px x 1800px
+        const PAPER_WIDTH = Math.round(4.0 * DPI);  // 1200px
+        const PAPER_HEIGHT = Math.round(6.0 * DPI); // 1800px
+
+        // Strip Theme & Layout Margins (Matches your uploaded maroon reference photo)
+        const STRIP_BG_COLOR = '#4A0404'; // Deep maroon from your reference image
+        const SIDE_MARGIN = Math.round((STRIP_WIDTH - PIC_WIDTH) / 2); // 30px (0.1 inch border on left & right)
+        const TOP_MARGIN = 26; // Top maroon border
+        const PHOTO_GAP = 26;  // Maroon gap between Photo 1 and Photo 2
+
+        // Event Text Constants (Matches your reference image)
+        const EVENT_NAME = "NCC INTEGRATIONAL ACTIVITY";
         const EVENT_DATE = "2026";
-
-        function setLayout(layout) {
-            currentLayout = layout;
-            photosRequired = layout === 'polaroid' ? 1 : 4;
-            
-            const buttons = ['polaroid', 'strip', '4r'];
-            buttons.forEach(btn => {
-                const el = document.getElementById(`btn-${btn}`);
-                if (btn === layout) {
-                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
-                    el.classList.remove('text-gray-500', 'hover:text-[#800020]');
-                } else {
-                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
-                    el.classList.add('text-gray-500', 'hover:text-[#800020]');
-                }
-            });
-        }
 
         function setFilter(filter) {
             currentFilter = filter;
@@ -241,15 +274,14 @@
             filters.forEach(f => {
                 const el = document.getElementById(`btn-filter-${f}`);
                 if (f === filter) {
-                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
-                    el.classList.remove('text-gray-500', 'bg-white', 'hover:text-[#800020]', 'border-gray-200');
+                    el.classList.add('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.remove('text-gray-500', 'bg-white', 'hover:text-[#4A0404]', 'border-gray-200');
                 } else {
-                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
-                    el.classList.add('text-gray-500', 'bg-white', 'hover:text-[#800020]', 'border-gray-200');
+                    el.classList.remove('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md', 'border-transparent');
+                    el.classList.add('text-gray-500', 'bg-white', 'hover:text-[#4A0404]', 'border-gray-200');
                 }
             });
 
-            // Update the review image filter immediately if we are in the review phase
             if (!reviewOverlay.classList.contains('hidden')) {
                 reviewImage.style.filter = filterMap[filter];
             }
@@ -262,20 +294,21 @@
             timers.forEach(t => {
                 const el = document.getElementById(`btn-timer-${t}`);
                 if (t === seconds) {
-                    el.classList.add('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
-                    el.classList.remove('text-gray-500', 'hover:text-[#800020]');
+                    el.classList.add('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.remove('text-gray-500', 'hover:text-[#4A0404]');
                 } else {
-                    el.classList.remove('bg-[#800020]', 'text-[#FDFBF7]', 'shadow-md');
-                    el.classList.add('text-gray-500', 'hover:text-[#800020]');
+                    el.classList.remove('bg-[#4A0404]', 'text-[#FDFBF7]', 'shadow-md');
+                    el.classList.add('text-gray-500', 'hover:text-[#4A0404]');
                 }
             });
         }
 
         async function initCamera() {
             errorOverlay.classList.add('hidden');
+            render4x6PaperCanvas(); // Draw initial empty 4x6 paper slots
             try {
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: { ideal: 1280 }, height: { ideal: 960 }, facingMode: "user" }, 
+                    video: { width: { ideal: 1440 }, height: { ideal: 960 }, facingMode: "user" }, 
                     audio: false 
                 });
                 video.srcObject = stream;
@@ -291,50 +324,59 @@
         const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         function lockControls(lock) {
-            const controls = ['btn-polaroid', 'btn-strip', 'btn-4r', 'btn-timer-3', 'btn-timer-5', 'btn-timer-10'];
+            const controls = ['btn-timer-3', 'btn-timer-5', 'btn-timer-10'];
             controls.forEach(id => document.getElementById(id).disabled = lock);
+        }
+
+        function openMobileResult() {
+            resultContainer.classList.remove('hidden');
+        }
+
+        function closeMobileResult() {
+            if (window.innerWidth < 768) {
+                resultContainer.classList.add('hidden');
+            }
         }
 
         async function startPhotoSequence() {
             if (!stream) return;
 
-            // Lock layouts and timers, reset UI
+            // If 4x6 paper already has 4 strips, start a fresh 4x6 sheet automatically
+            if (completedStrips.length >= STRIPS_PER_PAPER) {
+                completedStrips = [];
+                await render4x6PaperCanvas();
+            }
+
+            const currentStripNumber = completedStrips.length + 1;
             startBtn.disabled = true;
             lockControls(true);
             capturedFrames = [];
             
-            resultContainer.classList.add('opacity-0');
-            setTimeout(() => {
-                if(window.innerWidth < 768) resultContainer.classList.add('hidden');
-            }, 500);
+            closeMobileResult();
             
             progressIndicator.classList.remove('hidden');
-            statusText.innerText = "Get ready!";
+            statusText.innerText = `Capturing Strip ${currentStripNumber} of ${STRIPS_PER_PAPER}...`;
 
-            // Capture Loop
-            for (let i = 0; i < photosRequired; i++) {
-                progressIndicator.innerText = `${i + 1} / ${photosRequired}`;
+            // Capture 2 Photos for the current 2"x3" Strip
+            for (let i = 0; i < PHOTOS_PER_STRIP; i++) {
+                progressIndicator.innerText = `Photo ${i + 1} / ${PHOTOS_PER_STRIP}`;
                 let frameAccepted = false;
                 
                 while (!frameAccepted) {
                     await runCountdown();
                     triggerFlash();
                     
-                    // Capture raw frame without filters, filter applied on canvas later
                     const frameDataUrl = captureFrame(); 
-                    
-                    // Show Review UI (Filter buttons remain active so user can change them)
-                    const action = await showReviewUI(frameDataUrl, i === photosRequired - 1);
+                    const action = await showReviewUI(frameDataUrl, i === PHOTOS_PER_STRIP - 1);
                     
                     if (action === 'keep') {
-                        // Bake the currently selected filter into a new canvas before pushing
                         const filteredFrameUrl = await applyCurrentFilterToDataUrl(frameDataUrl);
                         capturedFrames.push(filteredFrameUrl);
                         frameAccepted = true;
                         
-                        if (i < photosRequired - 1) {
-                            statusText.innerText = "Next photo in a moment...";
-                            await sleep(750);
+                        if (i < PHOTOS_PER_STRIP - 1) {
+                            statusText.innerText = "Next pose in a moment...";
+                            await sleep(600);
                         }
                     } else {
                         statusText.innerText = "Retaking photo...";
@@ -343,24 +385,54 @@
                 }
             }
 
-            // Finish Sequence
             progressIndicator.classList.add('hidden');
-            statusText.innerText = `Generating ${currentLayout}...`;
+            statusText.innerText = `Adding Strip ${currentStripNumber} to 4×6 paper...`;
             
-            await generatePhotoLayout();
-            
-            statusText.innerText = "Done! Download your photo below.";
+            // Build the single 2"x3" strip and add it to the 4"x6" sheet
+            const singleStripDataUrl = await generateSingle2x3Strip();
+            completedStrips.push(singleStripDataUrl);
+            downloadSingleBtn.disabled = false;
+
+            await render4x6PaperCanvas();
+            updateUIForNextStrip();
+
+            // On phones, show the updated 4x6 paper preview
+            if (window.innerWidth < 768) {
+                openMobileResult();
+            }
+
             startBtn.disabled = false;
-            startBtn.innerText = "Retake Photos";
-            lockControls(false); // Unlock layouts/timers
+            lockControls(false);
+        }
+
+        function updateUIForNextStrip() {
+            const count = completedStrips.length;
+            sheetCounterBadge.innerText = `${count} / ${STRIPS_PER_PAPER} Strips`;
+
+            if (count < STRIPS_PER_PAPER) {
+                startBtn.innerText = `Capture Strip ${count + 1} of ${STRIPS_PER_PAPER}`;
+                statusText.innerText = `Strip ${count} added! Take ${STRIPS_PER_PAPER - count} more to fill the 4×6 paper.`;
+            } else {
+                startBtn.innerText = "Start New 4×6 Paper (1 of 4)";
+                statusText.innerText = "4×6 Photo Paper is FULL (4/4 Strips)! Ready to download & print.";
+            }
+        }
+
+        async function resetPaperSheet() {
+            completedStrips = [];
+            downloadSingleBtn.disabled = true;
+            sheetCounterBadge.innerText = `0 / ${STRIPS_PER_PAPER} Strips`;
+            startBtn.innerText = `Capture Strip 1 of ${STRIPS_PER_PAPER}`;
+            statusText.innerText = "4×6 sheet cleared. Ready for Strip 1...";
+            await render4x6PaperCanvas();
         }
 
         function showReviewUI(dataUrl, isLast) {
             return new Promise((resolve) => {
                 reviewImage.src = dataUrl;
-                reviewImage.style.filter = filterMap[currentFilter]; // Apply active filter visually
+                reviewImage.style.filter = filterMap[currentFilter];
                 reviewOverlay.classList.remove('hidden');
-                btnKeep.innerText = isLast ? "Finish" : "Keep & Continue";
+                btnKeep.innerText = isLast ? "Finish Strip" : "Keep & Next Pose";
                 reviewResolve = resolve;
             });
         }
@@ -381,7 +453,7 @@
                 const triggerAnimation = () => {
                     countdownText.innerText = count;
                     countdownText.classList.remove('animate-pop');
-                    void countdownText.offsetWidth; // Reflow
+                    void countdownText.offsetWidth;
                     countdownText.classList.add('animate-pop');
                 };
 
@@ -435,37 +507,26 @@
                     
                     ctx.filter = filterMap[currentFilter];
                     ctx.drawImage(img, 0, 0);
-                    ctx.filter = 'none'; // reset
+                    ctx.filter = 'none';
                     
-                    resolve(tempCanvas.toDataURL('image/jpeg', 0.95));
+                    resolve(tempCanvas.toDataURL('image/jpeg', 0.98));
                 };
                 img.src = dataUrl;
             });
         }
 
-        function generatePhotoLayout() {
+        // ============================================================================
+        // GENERATE SINGLE 2" x 3" STRIP (600px x 900px) WITH 1.8" x 1.2" PHOTOS
+        // ============================================================================
+        function generateSingle2x3Strip() {
             return new Promise((resolve) => {
-                const ctx = stripCanvas.getContext('2d');
-                let canvasWidth, canvasHeight;
+                singleStripCanvas.width = STRIP_WIDTH;   // 600px (2 inches)
+                singleStripCanvas.height = STRIP_HEIGHT; // 900px (3 inches)
+                const ctx = singleStripCanvas.getContext('2d');
 
-                if (currentLayout === 'polaroid') {
-                    canvasWidth = FRAME_WIDTH + (PADDING * 2);
-                    canvasHeight = FRAME_HEIGHT + (PADDING * 2) + BOTTOM_MARGIN;
-                } else if (currentLayout === 'strip') {
-                    canvasWidth = FRAME_WIDTH + (PADDING * 2);
-                    canvasHeight = (FRAME_HEIGHT * 4) + (PADDING * 5) + BOTTOM_MARGIN;
-                } else if (currentLayout === '4r') {
-                    // 4R Landscape (2x2 grid)
-                    canvasWidth = 1800;
-                    canvasHeight = 1200;
-                }
-                
-                stripCanvas.width = canvasWidth;
-                stripCanvas.height = canvasHeight;
-
-                // Solid background
+                // Deep Maroon Theme Background (#4A0404)
                 ctx.fillStyle = STRIP_BG_COLOR;
-                ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                ctx.fillRect(0, 0, STRIP_WIDTH, STRIP_HEIGHT);
 
                 let loadedImages = 0;
                 const images = [];
@@ -475,12 +536,17 @@
                     img.onload = () => {
                         images[index] = img;
                         loadedImages++;
-                        if (loadedImages === photosRequired) {
-                            if (currentLayout === 'polaroid') drawPolaroid(ctx, images[0], canvasWidth, canvasHeight);
-                            else if (currentLayout === 'strip') drawStrip(ctx, images, canvasWidth, canvasHeight);
-                            else if (currentLayout === '4r') draw4R(ctx, images, canvasWidth, canvasHeight);
-                            
-                            resolve();
+                        if (loadedImages === PHOTOS_PER_STRIP) {
+                            // Draw Photo 1 and Photo 2 at exact 1.8" x 1.2" (540px x 360px) size
+                            images.forEach((photoImg, i) => {
+                                const yPos = TOP_MARGIN + (i * (PIC_HEIGHT + PHOTO_GAP));
+                                drawCroppedImage(ctx, photoImg, SIDE_MARGIN, yPos, PIC_WIDTH, PIC_HEIGHT);
+                            });
+
+                            // Draw Event Branding Footer ("NCC INTEGRATIONAL ACTIVITY" / "2026")
+                            drawStripFooterText(ctx, STRIP_WIDTH / 2);
+
+                            resolve(singleStripCanvas.toDataURL('image/jpeg', 0.98));
                         }
                     };
                     img.src = src;
@@ -488,50 +554,8 @@
             });
         }
 
-        function drawPolaroid(ctx, img, canvasWidth, canvasHeight) {
-            drawCroppedImage(ctx, img, PADDING, PADDING, FRAME_WIDTH, FRAME_HEIGHT);
-            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (BOTTOM_MARGIN / 2) + 15, canvasWidth);
-            finalizeCanvas();
-        }
-
-        function drawStrip(ctx, images, canvasWidth, canvasHeight) {
-            images.forEach((img, index) => {
-                const yPos = PADDING + (index * (FRAME_HEIGHT + PADDING));
-                drawCroppedImage(ctx, img, PADDING, yPos, FRAME_WIDTH, FRAME_HEIGHT);
-            });
-            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (BOTTOM_MARGIN / 2) + 15, canvasWidth);
-            finalizeCanvas();
-        }
-
-        function draw4R(ctx, images, canvasWidth, canvasHeight) {
-            const padding4R = 40;
-            const bottomSpace = 180;
-            const availableWidth = canvasWidth - (padding4R * 3); 
-            const availableHeight = canvasHeight - bottomSpace - (padding4R * 3); 
-            
-            const cellWidth = availableWidth / 2;
-            const cellHeight = availableHeight / 2;
-
-            images.forEach((img, index) => {
-                const col = index % 2;
-                const row = Math.floor(index / 2);
-                
-                const xPos = padding4R + (col * (cellWidth + padding4R));
-                const yPos = padding4R + (row * (cellHeight + padding4R));
-                
-                drawCroppedImage(ctx, img, xPos, yPos, cellWidth, cellHeight);
-            });
-
-            addBrandingText(ctx, canvasWidth / 2, canvasHeight - (bottomSpace / 2) + 15, canvasWidth, true);
-            finalizeCanvas();
-        }
-
         function drawCroppedImage(ctx, img, x, y, width, height) {
-            // Shadow behind image
-            ctx.fillStyle = 'rgba(0,0,0,0.2)';
-            ctx.fillRect(x + 4, y + 4, width, height);
-
-            // Center Crop Math
+            // Center Crop Math to fit 1.8" x 1.2" (3:2 ratio) without stretching
             const sRatio = img.width / img.height;
             const dRatio = width / height;
             let sx = 0, sy = 0, sw = img.width, sh = img.height;
@@ -547,44 +571,114 @@
             ctx.drawImage(img, sx, sy, sw, sh, x, y, width, height);
         }
 
-        function addBrandingText(ctx, x, y, canvasWidth, isLarge = false) {
-            ctx.fillStyle = '#FFFFFF'; 
+        function drawStripFooterText(ctx, centerX) {
+            ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
-            
-            const titleSize = isLarge ? 48 : 34;
-            const dateSize = isLarge ? 56 : 42;
-            const spacing = isLarge ? 50 : 38;
 
-            // Line 1: Hardcoded Event Name
-            ctx.font = `900 ${titleSize}px "Inter", sans-serif`;
-            ctx.fillText(EVENT_NAME, x, y - 10);
-            
-            // Line 2: Hardcoded Event Date
-            ctx.font = `italic ${dateSize}px "Playfair Display", serif`;
-            ctx.fillText(EVENT_DATE, x, y + spacing);
+            // Line 1: Bold Uppercase Sans-Serif ("NCC INTEGRATIONAL ACTIVITY")
+            ctx.font = '900 30px "Inter", sans-serif';
+            ctx.fillText(EVENT_NAME, centerX, 822);
+
+            // Line 2: Italic Serif ("2026")
+            ctx.font = 'italic 44px "Playfair Display", serif';
+            ctx.fillText(EVENT_DATE, centerX, 870);
         }
 
-        function finalizeCanvas() {
-            const finalDataUrl = stripCanvas.toDataURL('image/jpeg', 0.95);
-            photoResult.src = finalDataUrl;
-            
-            resultContainer.classList.remove('hidden');
-            setTimeout(() => {
-                resultContainer.classList.remove('opacity-0');
-            }, 50);
+        // ============================================================================
+        // RENDER 4" x 6" PHOTO PAPER (1200px x 1800px) HOLDING 4 STRIPS (2x2 GRID)
+        // ============================================================================
+        function render4x6PaperCanvas() {
+            return new Promise((resolve) => {
+                paperCanvas.width = PAPER_WIDTH;   // 1200px (4 inches)
+                paperCanvas.height = PAPER_HEIGHT; // 1800px (6 inches)
+                const ctx = paperCanvas.getContext('2d');
 
-            if (window.innerWidth < 768) {
-                setTimeout(() => {
-                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 100);
-            }
+                // Fill paper background
+                ctx.fillStyle = '#F3EFEA';
+                ctx.fillRect(0, 0, PAPER_WIDTH, PAPER_HEIGHT);
+
+                // Coordinates for the 4 slots (2 columns x 2 rows of 600x900 strips)
+                const slots = [
+                    { x: 0,           y: 0,            label: "STRIP 1" }, // Top-Left
+                    { x: STRIP_WIDTH, y: 0,            label: "STRIP 2" }, // Top-Right
+                    { x: 0,           y: STRIP_HEIGHT, label: "STRIP 3" }, // Bottom-Left
+                    { x: STRIP_WIDTH, y: STRIP_HEIGHT, label: "STRIP 4" }  // Bottom-Right
+                ];
+
+                // Draw placeholder slots first
+                slots.forEach((slot, idx) => {
+                    ctx.fillStyle = '#EAE4DC';
+                    ctx.fillRect(slot.x, slot.y, STRIP_WIDTH, STRIP_HEIGHT);
+
+                    // Placeholder text for empty slots
+                    ctx.fillStyle = '#9CA3AF';
+                    ctx.textAlign = 'center';
+                    ctx.font = '700 32px "Inter", sans-serif';
+                    ctx.fillText(`${slot.label} (EMPTY)`, slot.x + STRIP_WIDTH / 2, slot.y + STRIP_HEIGHT / 2 - 10);
+                    ctx.font = '400 22px "Inter", sans-serif';
+                    ctx.fillText('2" × 3" Slot', slot.x + STRIP_WIDTH / 2, slot.y + STRIP_HEIGHT / 2 + 30);
+                });
+
+                if (completedStrips.length === 0) {
+                    drawCuttingGuides(ctx);
+                    paperResult.src = paperCanvas.toDataURL('image/jpeg', 0.95);
+                    resolve();
+                    return;
+                }
+
+                // Draw each completed strip into its slot
+                let loaded = 0;
+                completedStrips.forEach((stripDataUrl, index) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const slot = slots[index];
+                        ctx.drawImage(img, slot.x, slot.y, STRIP_WIDTH, STRIP_HEIGHT);
+                        loaded++;
+                        if (loaded === completedStrips.length) {
+                            drawCuttingGuides(ctx);
+                            paperResult.src = paperCanvas.toDataURL('image/jpeg', 0.98);
+                            resolve();
+                        }
+                    };
+                    img.src = stripDataUrl;
+                });
+            });
         }
 
-        function downloadPhotoStrip() {
-            if (!photoResult.src) return;
+        function drawCuttingGuides(ctx) {
+            // Subtle 1px trim guide lines down the center (x = 600) and middle (y = 900)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+            ctx.lineWidth = 2;
+
+            // Vertical center cut line
+            ctx.beginPath();
+            ctx.moveTo(STRIP_WIDTH, 0);
+            ctx.lineTo(STRIP_WIDTH, PAPER_HEIGHT);
+            ctx.stroke();
+
+            // Horizontal middle cut line
+            ctx.beginPath();
+            ctx.moveTo(0, STRIP_HEIGHT);
+            ctx.lineTo(PAPER_WIDTH, STRIP_HEIGHT);
+            ctx.stroke();
+        }
+
+        function download4x6Paper() {
+            if (!paperResult.src) return;
             const link = document.createElement('a');
-            link.download = `atelier-${currentLayout}-${Date.now()}.jpg`;
-            link.href = photoResult.src;
+            link.download = `4x6-photo-paper-${completedStrips.length}strips-${Date.now()}.jpg`;
+            link.href = paperResult.src;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function downloadLatestSingleStrip() {
+            if (completedStrips.length === 0) return;
+            const latestStrip = completedStrips[completedStrips.length - 1];
+            const link = document.createElement('a');
+            link.download = `single-2x3-strip-${completedStrips.length}-${Date.now()}.jpg`;
+            link.href = latestStrip;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
